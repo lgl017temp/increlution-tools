@@ -63,14 +63,14 @@ plugins.push({
 		.decelerate();
 		
 		pathViewPort.addListener("drag-start", () => {
-			console.log("drag-start");
+			// console.log("drag-start");
 			pathPIXI.ticker.start();
 		}).addListener("drag-end", () => {
-			console.log("drag-end");
+			// console.log("drag-end");
 		}).addListener("moved", () => {
-			console.log("moved");
+			// console.log("moved");
 		}).addListener("moved-end", () => {
-			console.log("moved-end");
+			// console.log("moved-end");
 			pathPIXI.render();
 			pathPIXI.ticker.stop();
 		});

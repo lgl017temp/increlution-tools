@@ -2167,8 +2167,4 @@ var cnRegReplace = new Map([
     [/^Req: (.+) \/ (.+) elves$/, '成本：$1 \/ $2 精灵'],
     [/^Usages: (\d+)\/$/, '用途：$1\/'],
     [/^workers: (\d+)\/$/, '工人：$1\/'],
-
-	[/^(\+[\d\.]+)e([\d\.,]+) health when eaten$/, '食用时 $1e$2 生命值'],
-    [/^(\+[\d\.]+) health when eaten$/, '食用时 $1 生命值'],
-    [/^(\+[\d\.]+) ([A-Z]) health when eaten$/, '食用时 $1 $2 生命值'],
 ]);

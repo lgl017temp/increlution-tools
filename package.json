@@ -1,0 +1,30 @@
+{
+  "name": "increlution-tools",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "watch": "rollup -cw",
+    "build": "rollup -c"
+  },
+  "author": "lgl017",
+  "type": "module",
+  "dependencies": {
+    "break_infinity.js": "^2.0.0",
+    "jquery": "^3.6.2",
+    "pixi-viewport": "^4.38.0",
+    "pixi.js": "6.5.8"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@types/jquery": "^3.5.14",
+    "@types/node": "^18.11.16",
+    "esbuild": "^0.16.8",
+    "rollup": "^3.7.5",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-esbuild": "^5.0.0",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.4"
+  }
+}

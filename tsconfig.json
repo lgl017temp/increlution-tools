@@ -1,0 +1,34 @@
+{
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "esnext",
+		"moduleResolution": "node",
+		"strict": true,
+		// "importHelpers": true,
+		"experimentalDecorators": true,
+		// "esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"sourceMap": false,
+		// "isolatedModules": true,
+		"baseUrl": ".",
+		"lib": [
+			"esnext",
+			"dom",
+			"dom.iterable",
+			"scripthost",
+		],
+	},
+	"include": [
+		// "src/**/*.ts",
+		// "src/**/*.d.ts",
+		// "src/**/*.tsx",
+		// "src/**/*.vue",
+		// "src/*.d.ts",
+		"*.ts", "src/IncrelutionCheat.ts",
+	],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"src/**/d/**/*.d.ts"
+	]
+}

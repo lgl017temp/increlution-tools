@@ -2,6 +2,8 @@
 
 increlution的小工具，包含流程图和修改
 
+![image](https://user-images.githubusercontent.com/108338093/211773445-a4ddbb9f-5b7f-439a-8ce5-b67ee1ba69ba.png)
+
 ### 使用
 
 到dist里下载编译后模块
@@ -16,13 +18,15 @@ increlution的小工具，包含流程图和修改
 
 重新打开程序即可
 
-### 声明
+### 版权声明
 
-若increlution作者认为不妥将会删除
-
-### 关于汉化
+若increlution作者认为不妥，请联系我删除
 
 汉化使用[git游戏](http://www.gityx.com/)的汉化
+
+流程图使用PIXI.js绘制
+
+### 关于汉化
 
 流程图可配合汉化使用
 

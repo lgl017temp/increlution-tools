@@ -9,6 +9,7 @@ let types = ["all", "chart", "cheat"];
 let exp = [];
 types.forEach(type => {
 	let banner = `/* 
+ * https://github.com/lgl017temp/increlution-tools
  * 将本文件放在electron-index.html旁，以下代码段放在最后html最后
  * <script src="IncrelutionTools_${type}.js" type="module" charset="utf-8"></script>
  */`;

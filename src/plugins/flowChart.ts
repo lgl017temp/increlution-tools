@@ -1,4 +1,4 @@
-import { Plugin, save, load, toggle, plugins, settings, btnContainer, gameLoadPromise, Game, getLocal } from "../core";
+import { Plugin, save, load, toggle, plugins, settings, btnContainer, gameLoadPromise, Game, getLocal, doEval } from "../core";
 
 import type DecimalType from "break_infinity.js";
 import type {} from "jquery";
@@ -1198,14 +1198,14 @@ function getFuncStr(func: () => any, data: SkillGame | JobGame | ConstructionGam
 function fixVarNames(str: string, data: SkillGame | JobGame | ConstructionGame | ExplorGame) {
 	let result = str;
 	result = result.replace(/a0_0x2115\('.*?'\)/g, (val) => {
-		return "'" + eval(val) + "'";
+		return "'" + doEval(val) + "'";
 	});
 	Object.keys(varNames).forEach(key => {
 		result = result.replace(new RegExp(key, "g"), varNames[key]);
 	});
 
 	result = result.replace(/([\[\(, ])(0x[0-9a-f]+)([\]\), ])/g, (val, match1, match2, match3) => {
-		return match1 + eval(match2) + match3;
+		return match1 + doEval(match2) + match3;
 	});
 	result = result.replace(/(0x0)/g, "0");
 	result = result.replace(/a0_0x514b1f/g, (val, match1, match2) => {

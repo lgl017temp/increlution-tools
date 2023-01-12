@@ -3,8 +3,10 @@ import commonjs from 'rollup-plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import nodePolyfills from 'rollup-plugin-node-polyfills';
 import resolve from 'rollup-plugin-node-resolve';
+import { readdirSync } from 'fs';
 
-let types = ["all", "chart", "cheat"];
+let files = readdirSync("src/buildType");
+let types = files.filter(file => file.endsWith(".ts")).map(file => file.replace(/\.ts$/, ""));
 
 let exp = [];
 types.forEach(type => {

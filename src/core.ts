@@ -167,6 +167,10 @@ export function getLocal(key: string) {
 	return key;
 }
 
+export function doEval(str: string) {
+	return window.Function(`"use strict";return ${str};`)();
+}
+
 let gameLoadPromiseResolve: () => void;
 export let gameLoadPromise = new Promise<void>((resolve) => {
 	gameLoadPromiseResolve = resolve;

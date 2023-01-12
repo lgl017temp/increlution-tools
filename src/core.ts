@@ -46,6 +46,10 @@ let optionBtn: JQuery<HTMLElement>;
 export function init() {
 	load();
 
+	let css = document.createElement("style");
+	css.innerHTML = `#action-containers-column .row.game-block-container:last-child { margin-bottom: 30px; }`;
+	document.head.appendChild(css);
+
 	btnContainer = $(`<div style="display: flex; align-items: flex-end;flex-wrap: wrap;flex-direction: row;justify-content: flex-end;position: absolute; bottom: 0; left: 0; max-width: 100vw;"></div>`);
 
 	optionBtn = $(`<button style="margin-left: 40px;height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" type="button" class="btn btn-block btn-light""><span>${getLocal(`lang[${settings.locale}]`)}</span></button>`);

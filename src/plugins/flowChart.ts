@@ -1,4 +1,4 @@
-import { Plugin, save, load, toggle, plugins, settings, btnContainer, gameLoadPromise, Game } from "../core";
+import { Plugin, save, load, toggle, plugins, settings, btnContainer, gameLoadPromise, Game, getLocal } from "../core";
 
 import type DecimalType from "break_infinity.js";
 import type {} from "jquery";
@@ -21,7 +21,7 @@ declare let cnRegReplace: Map<RegExp, string>;
 let togglePathBtn: JQuery<HTMLElement>;
 plugins.push({
 	init: () => {
-		togglePathBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.showPath ? 'running' : 'paused'}" data-original-title="显示路线"><i class="fas ${settings.showPath ? 'fa-play' : 'fa-pause'}"></i> <span>显示路线</span></button>`);
+		togglePathBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.showPath ? 'running' : 'paused'}"><i class="fas ${settings.showPath ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("chart.togglePath")}</span></button>`);
 		btnContainer.append(togglePathBtn);
 		togglePathBtn.on("click", function() {
 			if (settings.showPath) {
@@ -44,7 +44,7 @@ plugins.push({
 			backgroundAlpha: 0.5,
 		});
 		pathPIXI.ticker.stop();
-		$(pathPIXI.view).css({"border-radius": "10px", border: "1px solid #666666", position: "absolute", bottom: "30px", right: "0", zoom: 1 / window.devicePixelRatio}).appendTo(btnContainer);
+		$(pathPIXI.view).css({"border-radius": "10px", border: "1px solid #666666", position: "absolute", bottom: "30px", left: "0", zoom: 1 / window.devicePixelRatio}).appendTo(btnContainer);
 
 		pathViewPort = new pixi_viewport.Viewport({
 			screenWidth: window.innerWidth * 256,
@@ -93,7 +93,24 @@ plugins.push({
 			$(pathPIXI.view).hide();
 			chepBtns.forEach(btn => $(btn).hide());
 		}
-	}
+	},
+	changeLocale: () => {
+		togglePathBtn.find("span").html(getLocal("chart.togglePath") as string);
+		chepBtns.forEach((btn, i) => {
+			if (i === chepBtns.length - 1) {
+				btn.find("span").html(`${getLocal("chart.end")}`);
+			} else {
+				btn.find("span").html(`${getLocal("chart.chepPrefix")}${i + 1}${getLocal("chart.chepSuffix")}`);
+			}
+		});
+		pathViewPort.removeChildren();
+		pathInited = false;
+		if (settings.showPath) {
+			gameLoadPromise.then(() => {
+				buildPathImage();
+			});
+		}
+	},
 })
 
 let formatNum = a0_0x22e9fa;
@@ -393,13 +410,14 @@ function buildPathImage() {
 
 	let centerX = imageWH[0] / 2;
 
-	let root = buildDataImage({type: "start", level: 0});
-	pathViewPort.addChild(root);
-	root.x = centerX;
-	root.y = imagePadding[1];
+	let start = buildDataImage({type: "start", level: 0});
+	pathViewPort.addChild(start);
+	start.x = centerX;
+	start.y = imagePadding[1];
+	imgs["start"] = start;
 
 	let level = 1;
-	let lastHeight = 10;
+	let lastHeight = blockGap[1];
 	let lastLevelData = getDataByLevel(level);
 	let lineImgs: PIXIType.Graphics[] = [];
 	let maxW = 0;
@@ -572,16 +590,35 @@ function buildPathImage() {
 		maxW = Math.max(maxW, sumW + (lineImgs.length + 1) * blockGap[0] + blockPadding * 20);
 	}
 
+	let end = buildDataImage({type: "end", level: level});
+	pathViewPort.addChild(end);
+	end.x = centerX;
+	end.y = imagePadding[1] + lastHeight + level * blockGap[1] + blockPadding + 15;
+	imgs["end"] = end;
+
 	cheps.forEach((c, i) => {
-		let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;position: absolute; bottom: ${(cheps.length - i) * 30 + 10}px; right: 0" type="button" class="btn btn-block btn-light" data-original-title="第${i + 1}章"><span>第${i + 1}章</span></button>`);
-		$(btnContainer).append(btn);
-
-		btn.on("click", () => {
-			let img = imgs["exploration_" + c];
-			pathViewPort.position = new PIXI.Point(-centerX * pathViewPort.scale.x + centerX, -img.y * pathViewPort.scale.y + imageWH[1] / 4);
-		})
-
-		chepBtns.push(btn);
+		if (!chepBtns[i]) {
+			let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${(cheps.length - i + 1) * 30 + 10}px; left: 0" type="button" class="btn btn-block btn-light"><span>${getLocal("chart.chepPrefix")}${i + 1}${getLocal("chart.chepSuffix")}</span></button>`);
+			$(btnContainer).append(btn);
+	
+			btn.on("click", () => {
+				let img = imgs["exploration_" + c];
+				pathViewPort.position = new PIXI.Point(-centerX * pathViewPort.scale.x + centerX, -img.y * pathViewPort.scale.y + imageWH[1] / 4);
+			})
+			
+			chepBtns.push(btn);
+			
+			if (i === cheps.length - 1) {
+				let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${30 + 10}px; left: 0" type="button" class="btn btn-block btn-light"><span>${getLocal("chart.end")}</span></button>`);
+				$(btnContainer).append(btn);
+		
+				btn.on("click", () => {
+					let img = imgs["end"];
+					pathViewPort.position = new PIXI.Point(-centerX * pathViewPort.scale.x + centerX, -img.y * pathViewPort.scale.y + imageWH[1] / 4);
+				})
+				chepBtns.push(btn);
+			}
+		}
 
 		let sy = imgs["exploration_" + c];
 		let ey = imgs["exploration_" + (cheps[i + 1] - 1)];
@@ -599,10 +636,19 @@ function buildPathImage() {
 		chepBlock.y = -blockGap[1] / 2;
 
 		pathViewPort.addChild(chepBlock);
+
+		if (i === cheps.length - 1) {
+			let chepBlock = new PIXI.Graphics();
+			chepBlock.lineStyle(lineWidth, 0xff0000);
+			chepBlock.moveTo(0, end.y);
+			chepBlock.lineTo(maxW, end.y);
+			chepBlock.x = centerX - maxW / 2;
+			chepBlock.y = -blockGap[1] / 2 - 15;
+
+			pathViewPort.addChild(chepBlock);
+		}
 	});
 	toggle();
-
-	console.log("-------------");
 
 	pathInited = true;
 	pathPIXI.render();
@@ -864,7 +910,7 @@ function buildDataImage(json: DataJson) {
 		result.drawCircle(0, 0, 10);
 		result.endFill();
 
-		result.arc(0, 0, 15, Math.PI, 0);
+		result.arc(0, 0, 15, Math.PI, 2 * Math.PI);
 	}
 		
 	return result;
@@ -1637,7 +1683,7 @@ function handleHtml(str: string) {
 	return str;
 }
 function translate(str: string) {
-	if (typeof cnItems === "undefined") {
+	if (typeof cnItems === "undefined" || settings.locale !== "cn") {
 		return str;
 	}
 	

@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "watch": "rollup -cw",
-    "build": "rollup -c"
+    "build": "rollup -c --environment BUILD:production"
   },
   "author": "lgl017",
   "type": "module",

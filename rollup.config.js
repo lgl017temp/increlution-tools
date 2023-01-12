@@ -17,7 +17,7 @@ types.forEach(type => {
 	exp.push({
 		input: `src/buildType/${type}.ts`,
 		output: {
-			file: `dist/IncrelutionTools_${type}.js`,
+			file: process.env.BUILD === 'production' ? `dist/IncrelutionTools_${type}.js` : `debug/IncrelutionTools_${type}.js`,
 			banner
 		},
 		plugins: [
@@ -30,12 +30,12 @@ types.forEach(type => {
 			}),
 			commonjs(),
 			esbuild({
-				minify: true,
+				minify: process.env.BUILD === 'production',
 			}),
-			minify({
+			process.env.BUILD === 'production' ? minify({
 				logLevel: "silent",
 				banner
-			}),
+			}) : undefined,
 		]
 	});
 });

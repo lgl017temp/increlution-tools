@@ -1,4 +1,4 @@
-import { Plugin, save, load, toggle, plugins, settings, btnContainer, gameLoadPromise, Game } from "../core";
+import { Plugin, save, load, toggle, plugins, settings, btnContainer, gameLoadPromise, Game, getLocal } from "../core";
 
 import type DecimalType from "break_infinity.js";
 declare let Decimal: typeof DecimalType;
@@ -16,7 +16,24 @@ let toggleCheatBtn: JQuery<HTMLElement>;
 
 plugins.push({
 	init: () => {
-		speedBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.speedEn ? 'running' : 'paused'}" data-original-title="倍速"><i class="fas ${settings.speedEn ? 'fa-play' : 'fa-pause'}"></i> <span><input style="display: inline-block;width: 52px;text-align:center;height: 12px;font-size:12px;" type="text" class="form-control maxlength="3"> 倍速</span></button>`);
+		toggleCheatBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.showCheat ? 'running' : 'paused'}"><i class="fas ${settings.showCheat ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("cheat.toggleCheat")}</span></button>`);
+		btnContainer.append(toggleCheatBtn);
+		toggleCheatBtn.on("click", function() {
+			if (settings.showCheat) {
+				settings.showCheat = false;
+				$(this).addClass("paused").removeClass("running");
+				$(this).find("i").addClass("fa-pause").removeClass("fa-play");
+			} else {
+				settings.showCheat = true;
+				$(this).removeClass("paused").addClass("running");
+				$(this).find("i").removeClass("fa-pause").addClass("fa-play");
+			}
+			save();
+
+			toggle();
+		})
+		
+		speedBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.speedEn ? 'running' : 'paused'}"><i class="fas ${settings.speedEn ? 'fa-play' : 'fa-pause'}"></i> <span><input style="display: inline-block;width: 52px;text-align:center;height: 12px;font-size:12px;" type="text" class="form-control maxlength="3"> <span>${getLocal("cheat.speed")}</span></span></button>`);
 		btnContainer.append(speedBtn);
 		speedBtn.find("input").val(settings.speedMul).on("input", function() {
 			let mul = +$(this).val()!;
@@ -43,7 +60,7 @@ plugins.push({
 			save();
 		});
 
-		skillBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.skillEn ? 'running' : 'paused'}" data-original-title="技能经验"><i class="fas ${settings.skillEn ? 'fa-play' : 'fa-pause'}"></i> <span><input style="display: inline-block;width: 52px;text-align:center;height: 12px;font-size:12px;" type="text" class="form-control maxlength="3"> 倍经验</span></button>`);
+		skillBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.skillEn ? 'running' : 'paused'}"><i class="fas ${settings.skillEn ? 'fa-play' : 'fa-pause'}"></i> <span><input style="display: inline-block;width: 52px;text-align:center;height: 12px;font-size:12px;" type="text" class="form-control maxlength="3"> <span>${getLocal("cheat.skill")}</span></span></button>`);
 		btnContainer.append(skillBtn);
 		skillBtn.find("input").val(settings.skillMul).on("input", function() {
 			let mul = +$(this).val()!;
@@ -70,7 +87,7 @@ plugins.push({
 			save();
 		});
 
-		healthBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.healthEn ? 'running' : 'paused'}" data-original-title="锁血"><i class="fas ${settings.healthEn ? 'fa-play' : 'fa-pause'}"></i> <span>锁血</span></button>`);
+		healthBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.healthEn ? 'running' : 'paused'}"><i class="fas ${settings.healthEn ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("cheat.health")}</span></button>`);
 		btnContainer.append(healthBtn);
 		healthBtn.on("click", function() {
 			if (settings.healthEn) {
@@ -85,7 +102,7 @@ plugins.push({
 			save();
 		});
 
-		storgeBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.inventoryEn ? 'running' : 'paused'}" data-original-title="锁库存"><i class="fas ${settings.inventoryEn ? 'fa-play' : 'fa-pause'}"></i> <span>锁库存</span></button>`);
+		storgeBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.inventoryEn ? 'running' : 'paused'}"><i class="fas ${settings.inventoryEn ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("cheat.storge")}</span></button>`);
 		btnContainer.append(storgeBtn);
 		storgeBtn.on("click", function() {
 			if (settings.inventoryEn) {
@@ -100,7 +117,7 @@ plugins.push({
 			save();
 		});
 
-		rebirthBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.rebirthEn ? 'running' : 'paused'}" data-original-title="自动转生"><i class="fas ${settings.rebirthEn ? 'fa-play' : 'fa-pause'}"></i> <span>自动转生</span></button>`);
+		rebirthBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.rebirthEn ? 'running' : 'paused'}"><i class="fas ${settings.rebirthEn ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("cheat.rebirth")}</span></button>`);
 		btnContainer.append(rebirthBtn);
 		rebirthBtn.on("click", function() {
 			if (settings.rebirthEn) {
@@ -117,7 +134,7 @@ plugins.push({
 		
 		let confirmed = 3;
 		let confirmInterval = 0;
-		autoBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" type="button" class="btn btn-block btn-light" data-original-title="请先备份存档，此操作无撤销！(使用存读档方式)(按住3秒)"><i class="fas"></i> <span>解锁自动</span></button>`);
+		autoBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" type="button" class="btn btn-block btn-light" data-original-title="${getLocal("cheat.autoTip")}"><span>${getLocal("cheat.auto")}</span></button>`);
 		btnContainer.append(autoBtn);
 		autoBtn.on("mousedown", function() {
 			$(this).find("span").html("&emsp;&emsp;"+confirmed+"&emsp;&emsp;");
@@ -129,7 +146,7 @@ plugins.push({
 					if (game) {
 						clearInterval(confirmInterval);
 						confirmed = 3;
-						$(this).find("span").html("解锁自动");
+						$(this).find("span").html(getLocal("cheat.auto") as string);
 
 						game.jobs.forEach(d => {
 							if (!d.isAutomationUnlocked) {
@@ -173,25 +190,8 @@ plugins.push({
 		$(document).on("mouseup", function() {
 			clearInterval(confirmInterval);
 			confirmed = 3;
-			autoBtn.find("span").html("解锁自动");
+			autoBtn.find("span").html(getLocal("cheat.auto") as string);
 		});
-
-		toggleCheatBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.showCheat ? 'running' : 'paused'}" data-original-title="显示修改"><i class="fas ${settings.showCheat ? 'fa-play' : 'fa-pause'}"></i> <span>显示修改</span></button>`);
-		btnContainer.append(toggleCheatBtn);
-		toggleCheatBtn.on("click", function() {
-			if (settings.showCheat) {
-				settings.showCheat = false;
-				$(this).addClass("paused").removeClass("running");
-				$(this).find("i").addClass("fa-pause").removeClass("fa-play");
-			} else {
-				settings.showCheat = true;
-				$(this).removeClass("paused").addClass("running");
-				$(this).find("i").removeClass("fa-pause").addClass("fa-play");
-			}
-			save();
-
-			toggle();
-		})
 	},
 	settings: {
 		speedMul: 10,
@@ -223,6 +223,16 @@ plugins.push({
 			rebirthBtn.hide();
 			autoBtn.hide();
 		}
+	},
+	changeLocale: () => {
+		speedBtn.find("span").find("span").html(getLocal("cheat.speed") as string);
+		skillBtn.find("span").find("span").html(getLocal("cheat.skill") as string);
+		healthBtn.find("span").html(getLocal("cheat.health") as string);
+		storgeBtn.find("span").html(getLocal("cheat.storge") as string);
+		rebirthBtn.find("span").html(getLocal("cheat.rebirth") as string);
+		autoBtn.find("span").html(getLocal("cheat.auto") as string);
+		autoBtn.attr("data-original-title", getLocal("cheat.autoTip") as string);
+		toggleCheatBtn.find("span").html(getLocal("cheat.toggleCheat") as string);
 	},
 });
 

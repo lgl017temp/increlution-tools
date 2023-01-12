@@ -19,12 +19,12 @@
 		],
 	},
 	"include": [
-		// "src/**/*.ts",
-		// "src/**/*.d.ts",
+		"src/**/*.ts",
+		"src/**/*.d.ts",
 		// "src/**/*.tsx",
 		// "src/**/*.vue",
 		// "src/*.d.ts",
-		"*.ts", "src/IncrelutionCheat.ts",
+		"shims-env.d.ts",
 	],
 	"exclude": [
 		"node_modules",

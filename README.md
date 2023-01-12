@@ -34,7 +34,7 @@ increlution的小工具，包含流程图和修改
 
 -----------------------
 
-## 英文
+## English
 
 A increlution tool include flow chart and cheat
 

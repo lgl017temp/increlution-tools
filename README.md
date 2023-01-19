@@ -18,19 +18,15 @@ increlution的小工具，包含流程图和修改
 
 重新打开程序即可
 
-### 版权声明
-
-若increlution作者认为不妥，请联系我删除
+### 关于汉化
 
 汉化使用[git游戏](http://www.gityx.com/)的汉化
 
-流程图使用PIXI.js绘制
+https://gityx.com/help/faq/205.html
 
-### 关于汉化
+也可使用项目里chs/increlution-chs.js文件(不保证更新!)(在git游戏基础上修改，修复部分不匹配内容和过于奇怪的翻译)
 
-流程图可配合汉化使用
-
-也可使用项目里chs/increlution-chs文件(在git游戏基础上修改，修复部分不匹配内容和过于奇怪的翻译，不保证更新)
+流程图的中文需配合汉化使用
 
 -----------------------
 
@@ -51,9 +47,3 @@ Edit electron-index.html
 Add `<script src="IncrelutionTools_all.js" type="module" charset="utf-8"></script>` at end of file
 
 Reopen application
-
-### Copyright
-
-If the increlution author thinks it is inappropriate, please contact me to delete
-
-Flow chart draw with PIXI.js 

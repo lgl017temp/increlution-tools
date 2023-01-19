@@ -20,5 +20,7 @@ locales["cn"] = {
 		chepPrefix: "第",
 		chepSuffix: "章",
 		end: "结束",
+
+		spoiler: "允许剧透",
 	},
 };

@@ -19,6 +19,7 @@ declare let cnPostfix: Record<string, string>;
 declare let cnRegReplace: Map<RegExp, string>;
 
 let togglePathBtn: JQuery<HTMLElement>;
+let toggleSpoilerBtn: JQuery<HTMLElement>;
 plugins.push({
 	init: () => {
 		togglePathBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.showPath ? 'running' : 'paused'}"><i class="fas ${settings.showPath ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("chart.togglePath")}</span></button>`);
@@ -30,6 +31,23 @@ plugins.push({
 				$(this).find("i").addClass("fa-pause").removeClass("fa-play");
 			} else {
 				settings.showPath = true;
+				$(this).removeClass("paused").addClass("running");
+				$(this).find("i").removeClass("fa-pause").addClass("fa-play");
+			}
+			save();
+
+			toggle();
+		})
+
+		toggleSpoilerBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${30 + 10}px; left: 0;z-index:1" id="pause-button" type="button" class="btn btn-block btn-success ${settings.spoiler ? 'running' : 'paused'}"><i class="fas ${settings.spoiler ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("chart.spoiler")}</span></button>`);
+		btnContainer.append(toggleSpoilerBtn);
+		toggleSpoilerBtn.on("click", function() {
+			if (settings.spoiler) {
+				settings.spoiler = false;
+				$(this).addClass("paused").removeClass("running");
+				$(this).find("i").addClass("fa-pause").removeClass("fa-play");
+			} else {
+				settings.spoiler = true;
 				$(this).removeClass("paused").addClass("running");
 				$(this).find("i").removeClass("fa-pause").addClass("fa-play");
 			}
@@ -81,21 +99,28 @@ plugins.push({
 	},
 	settings: {
 		showPath: false,
+		spoiler: false,
 	},
 	toggle: () => {
 		if (settings.showPath) {
-			gameLoadPromise.then(() => {
-				buildPathImage();
-			});
+			buildPathImage();
 			$(pathPIXI.view).show();
 			chepBtns.forEach(btn => $(btn).show());
+			toggleSpoilerBtn.show();
 		} else {
 			$(pathPIXI.view).hide();
 			chepBtns.forEach(btn => $(btn).hide());
+			toggleSpoilerBtn.hide();
+		}
+		if (settings.spoiler) {
+			showSpoiler();
+		} else {
+			hideSpoiler();
 		}
 	},
 	changeLocale: () => {
 		togglePathBtn.find("span").html(getLocal("chart.togglePath") as string);
+		toggleSpoilerBtn.find("span").html(getLocal("chart.spoiler") as string);
 		chepBtns.forEach((btn, i) => {
 			if (i === chepBtns.length - 1) {
 				btn.find("span").html(`${getLocal("chart.end")}`);
@@ -106,9 +131,7 @@ plugins.push({
 		pathViewPort.removeChildren();
 		pathInited = false;
 		if (settings.showPath) {
-			gameLoadPromise.then(() => {
-				buildPathImage();
-			});
+			buildPathImage();
 		}
 	},
 })
@@ -149,6 +172,8 @@ let icons: Record<string, string> = {
 	"fa-arrow-alt-square-up" : "\uf353",
 	"full" : "\uf353",
 }
+
+//#region 类型声明
 
 type FuncString = string;
 
@@ -337,6 +362,8 @@ interface DataJson {
 	children?: DataJson[];
 }
 
+//#endregion
+
 let pathPIXI: PIXIType.Application;
 let pathViewPort: Viewport.Viewport;
 
@@ -403,7 +430,29 @@ function readGameData() {
 		buildDataLevel();
 	} while (checkDataLevel() && count < 1000);
 }
+let drawInterval: number | undefined;
 function buildPathImage() {
+	if (drawInterval) {
+		clearInterval(drawInterval);
+		drawInterval = undefined;
+	}
+
+	gameLoadPromise.then(() => {
+		let gen = _buildPathImage();
+		drawInterval = window.setInterval(() => {
+			let lastRes: IteratorResult<undefined, void> | undefined = undefined;
+			for (let i = 0; i < 10 && (!lastRes || !lastRes.done); i++) {
+				lastRes = gen.next();
+			}
+			if (lastRes?.done) {
+				clearInterval(drawInterval);
+				drawInterval = undefined;
+			}
+			pathPIXI.render();
+		}, 100);
+	});
+}
+function* _buildPathImage() {
 	if (pathInited) {
 		return;
 	}
@@ -588,6 +637,8 @@ function buildPathImage() {
 		level++;
 		lastLevelData = getDataByLevel(level);
 		maxW = Math.max(maxW, sumW + (lineImgs.length + 1) * blockGap[0] + blockPadding * 20);
+
+		yield;
 	}
 
 	let end = buildDataImage({type: "end", level: level});
@@ -598,7 +649,7 @@ function buildPathImage() {
 
 	cheps.forEach((c, i) => {
 		if (!chepBtns[i]) {
-			let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${(cheps.length - i + 1) * 30 + 10}px; left: 0" type="button" class="btn btn-block btn-light"><span>${getLocal("chart.chepPrefix")}${i + 1}${getLocal("chart.chepSuffix")}</span></button>`);
+			let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${(cheps.length - i + 2) * 30 + 10}px; left: 0" type="button" class="btn btn-block btn-light"><span>${getLocal("chart.chepPrefix")}${i + 1}${getLocal("chart.chepSuffix")}</span></button>`);
 			$(btnContainer).append(btn);
 	
 			btn.on("click", () => {
@@ -609,7 +660,7 @@ function buildPathImage() {
 			chepBtns.push(btn);
 			
 			if (i === cheps.length - 1) {
-				let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${30 + 10}px; left: 0" type="button" class="btn btn-block btn-light"><span>${getLocal("chart.end")}</span></button>`);
+				let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${60 + 10}px; left: 0" type="button" class="btn btn-block btn-light"><span>${getLocal("chart.end")}</span></button>`);
 				$(btnContainer).append(btn);
 		
 				btn.on("click", () => {
@@ -914,6 +965,33 @@ function buildDataImage(json: DataJson) {
 	}
 		
 	return result;
+}
+
+let hideSpoilerInterval: number | undefined;
+function hideSpoiler() {
+	if (!hideSpoilerInterval) {
+		hideSpoilerInterval = window.setInterval(() => {
+			if (game) {
+				game.skills.forEach(d => {
+					if (d.instinctLevel.eq(0)) {
+						
+					}
+				})
+			}
+
+			// Object.values(imgs).forEach(img => img.visible = true);
+			// Object.values(linkImgs).forEach(links => Object.values(links).forEach(img => img.visible = true));
+		}, 1000);
+	}
+}
+function showSpoiler() {
+	if (hideSpoilerInterval) {
+		clearInterval(hideSpoilerInterval);
+		hideSpoilerInterval = undefined;
+	}
+
+	Object.values(imgs).forEach(img => img.visible = true);
+	Object.values(linkImgs).forEach(links => Object.values(links).forEach(img => img.visible = true));
 }
 
 function resizePathImage() {

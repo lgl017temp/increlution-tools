@@ -22,7 +22,9 @@ export interface Game {
 		};
 	}[][];
 	skills: {
+		generationLevel: DecimalType;
 		generationExperience: DecimalType;
+		instinctLevel: DecimalType;
 		instinctExperience: DecimalType;
 	}[];
 	health: DecimalType;

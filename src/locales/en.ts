@@ -20,5 +20,7 @@ locales["en"] = {
 		chepPrefix: "Chep. ",
 		chepSuffix: "",
 		end: "End",
+
+		spoiler: "Allow Spoiler",
 	},
 };

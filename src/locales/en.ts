@@ -22,5 +22,7 @@ locales["en"] = {
 		end: "End",
 
 		spoiler: "Allow Spoiler",
+		highLightNotAuto: "HighLight Automation Locked",
+		jumpTo: "Jump To",
 	},
 };

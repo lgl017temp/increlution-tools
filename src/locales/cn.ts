@@ -22,5 +22,7 @@ locales["cn"] = {
 		end: "结束",
 
 		spoiler: "允许剧透",
+		highLightNotAuto: "高亮自动未解锁",
+		jumpTo: "跳转到",
 	},
 };

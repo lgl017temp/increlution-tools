@@ -1,4 +1,4 @@
-import { Plugin, save, load, toggle, plugins, settings, btnContainer, gameLoadPromise, Game, getLocal, doEval } from "../core";
+import { Plugin, save, load, toggle, plugins, settings, btnContainer, rootEl, gameLoadPromise, Game, getLocal, doEval } from "../core";
 
 import type DecimalType from "break_infinity.js";
 import type {} from "jquery";
@@ -20,6 +20,9 @@ declare let cnRegReplace: Map<RegExp, string>;
 
 let togglePathBtn: JQuery<HTMLElement>;
 let toggleSpoilerBtn: JQuery<HTMLElement>;
+let toggleHighLightNotAutoBtn: JQuery<HTMLElement>;
+let jumpToBtn: JQuery<HTMLElement>;
+let btnsOffset = 4;
 plugins.push({
 	init: () => {
 		togglePathBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.showPath ? 'running' : 'paused'}"><i class="fas ${settings.showPath ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("chart.togglePath")}</span></button>`);
@@ -56,6 +59,45 @@ plugins.push({
 			toggle();
 		})
 
+		toggleHighLightNotAutoBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${60 + 10}px; left: 0;z-index:1" id="pause-button" type="button" class="btn btn-block btn-success ${settings.highLightNotAuto ? 'running' : 'paused'}"><i class="fas ${settings.highLightNotAuto ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("chart.highLightNotAuto")}</span></button>`);
+		btnContainer.append(toggleHighLightNotAutoBtn);
+		toggleHighLightNotAutoBtn.on("click", function() {
+			if (settings.highLightNotAuto) {
+				settings.highLightNotAuto = false;
+				$(this).addClass("paused").removeClass("running");
+				$(this).find("i").addClass("fa-pause").removeClass("fa-play");
+			} else {
+				settings.highLightNotAuto = true;
+				$(this).removeClass("paused").addClass("running");
+				$(this).find("i").removeClass("fa-pause").addClass("fa-play");
+			}
+			save();
+
+			toggle();
+		})
+
+		jumpToBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${90 + 10}px; left: 0;z-index:1" type="button" class="btn btn-block btn-light"><span><span>${getLocal("chart.jumpTo")}</span><select style="display: inline-block;width: 152px;text-align:center;height: 17px;font-size:10px;vertical-align:text-bottom;padding:0;" class="form-control" /></span></button>`);
+		btnContainer.append(jumpToBtn);
+		jumpToBtn.find("select").on("change", function(e) {
+			let val = $(this).val() as string;
+			if (imgs[val]) {
+				let img = imgs[val];
+				let centerX = imageWH[0] / 2;
+				pathViewPort.position = new PIXI.Point(-img.x * pathViewPort.scale.x + centerX, -img.y * pathViewPort.scale.y + imageWH[1] / 4);
+			}
+		})
+		jumpToBtn.on("click", function(e) {
+			if (e.target instanceof HTMLSelectElement) {
+				return;
+			}
+			let val = jumpToBtn.find("select").val() as string;
+			if (imgs[val]) {
+				let img = imgs[val];
+				let centerX = imageWH[0] / 2;
+				pathViewPort.position = new PIXI.Point(-(img.x + img.width / 2) * pathViewPort.scale.x + centerX, -img.y * pathViewPort.scale.y + imageWH[1] / 4);
+			}
+		})
+
 		pathPIXI = new PIXI.Application({
 			width: imageWH[0] * window.devicePixelRatio - 2,
 			height: imageWH[1] * window.devicePixelRatio - 32,
@@ -77,9 +119,22 @@ plugins.push({
 		// pathPIXI.stage.addChild(pathViewPort);
 		pathPIXI.stage = pathViewPort;
 		pathViewPort.drag()
-		.pinch()
-		.wheel()
+		// .pinch()
+		// .wheel()
 		.decelerate();
+
+		let zoom = 0;
+		pathPIXI.view.addEventListener("wheel", (e) => {
+			if (e.deltaY < 0) {
+				zoom++;
+			} else {
+				zoom--;
+			}
+
+			pathViewPort.setZoom(Math.pow(1.2, zoom), true);
+
+			pathPIXI.render();
+		});
 		
 		let isMoving = false;
 		let isVisible = true;
@@ -122,28 +177,39 @@ plugins.push({
 	settings: {
 		showPath: false,
 		spoiler: false,
+		highLightNotAuto: false,
 	},
 	toggle: () => {
-		toggleSpoilerBtn.hide();
 		if (settings.showPath) {
 			buildPathImage();
 			$(pathPIXI.view).show();
 			chepBtns.forEach(btn => $(btn).show());
-			// toggleSpoilerBtn.show();
+			toggleSpoilerBtn.show();
+			toggleHighLightNotAutoBtn.show();
+			jumpToBtn.show();
 		} else {
 			$(pathPIXI.view).hide();
 			chepBtns.forEach(btn => $(btn).hide());
 			toggleSpoilerBtn.hide();
+			toggleHighLightNotAutoBtn.hide();
+			jumpToBtn.hide();
 		}
 		if (settings.spoiler) {
 			showSpoiler();
 		} else {
 			hideSpoiler();
 		}
+		if (settings.highLightNotAuto) {
+			enableHighLightNotAuto();
+		} else {
+			disableHighLightNotAuto();
+		}
 	},
 	changeLocale: () => {
 		togglePathBtn.find("span").html(getLocal("chart.togglePath") as string);
 		toggleSpoilerBtn.find("span").html(getLocal("chart.spoiler") as string);
+		toggleHighLightNotAutoBtn.find("span").html(getLocal("chart.highLightNotAuto") as string);
+		jumpToBtn.find("span").find("span").html(getLocal("chart.jumpTo") as string);
 		chepBtns.forEach((btn, i) => {
 			if (i === chepBtns.length - 1) {
 				btn.find("span").html(`${getLocal("chart.end")}`);
@@ -151,6 +217,7 @@ plugins.push({
 				btn.find("span").html(`${getLocal("chart.chepPrefix")}${i + 1}${getLocal("chart.chepSuffix")}`);
 			}
 		});
+		jumpToBtn.find("select").empty();
 		pathViewPort.removeChildren();
 		pathInited = false;
 		if (settings.showPath) {
@@ -581,15 +648,16 @@ function readGameData() {
 		url: "gniller-min.js", 
 		dataType: "text",
 		success: (jsStr: string) => {
-			window.gameData = gameData;
-			window.vars = vars;
-			window.varNames = varNames;
-			window.pathPIXI = pathPIXI;
-			window.pathViewPort = pathViewPort;
+			// window.gameData = gameData;
+			// window.vars = vars;
+			// window.varNames = varNames;
+			// window.pathPIXI = pathPIXI;
+			// window.pathViewPort = pathViewPort;
+			// window.imgs = imgs;
 			window.exportNoTrans = exportNoTrans;
 			window.allNoTrans = allNoTrans;
-			window.translate = translate;
-			window.buildJobJson = buildJobJson;
+			// window.buildJobJson = buildJobJson;
+			// window.translate = translate;
 
 			excractGameData(jsStr);
 			checkDataProp();
@@ -599,6 +667,59 @@ function readGameData() {
 			do {
 				buildDataLevel();
 			} while (checkDataLevel() && count < 100);
+
+			//去重
+			Object.keys(gameData.skill).forEach((key) => {
+				let data = gameData.skill[key];
+				let conds = data.dependency;
+				if (conds) {
+					data.dependency = mergeCond(conds);
+				}
+			});
+			Object.keys(gameData.job).forEach((key) => {
+				let data = gameData.job[key];
+				let conds = data.dependency;
+				if (conds) {
+					data.dependency = mergeCond(conds);
+				}
+			});
+			Object.keys(gameData.construction).forEach((key) => {
+				let data = gameData.construction[key];
+				let conds = data.dependency;
+				if (conds) {
+					data.dependency = mergeCond(conds);
+				}
+			});
+			Object.keys(gameData.exploration).forEach((key) => {
+				let data = gameData.exploration[key];
+				let conds = data.dependency;
+				if (conds) {
+					data.dependency = mergeCond(conds);
+				}
+			});
+			Object.keys(gameData.boss).forEach((key) => {
+				let data = gameData.boss[key];
+				let conds = data.dependency;
+				if (conds) {
+					data.dependency = mergeCond(conds);
+				}
+			});
+			Object.values(gameData.bossPhase).forEach(bossPhase => {
+				Object.keys(bossPhase).forEach((key) => {
+					let data = bossPhase[key];
+					let conds = data.dependency;
+					if (conds) {
+						data.dependency = mergeCond(conds);
+					}
+				});
+			})
+			Object.keys(gameData.hostile).forEach((key) => {
+				let data = gameData.hostile[key];
+				let conds = data.dependency;
+				if (conds) {
+					data.dependency = mergeCond(conds);
+				}
+			});
 		
 			readDataPromiseResolve();
 		}
@@ -633,11 +754,37 @@ function* _buildPathImage() {
 
 	let centerX = imageWH[0] / 2;
 
+	cheps.forEach((c, i) => {
+		if (!chepBtns[i]) {
+			let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${(cheps.length - i + btnsOffset) * 30 + 10}px; left: 0" type="button" class="btn btn-block btn-light"><span>${getLocal("chart.chepPrefix")}${i + 1}${getLocal("chart.chepSuffix")}</span></button>`);
+			$(btnContainer).append(btn);
+	
+			btn.on("click", () => {
+				let img = imgs["exploration_" + c];
+				pathViewPort.position = new PIXI.Point(-centerX * pathViewPort.scale.x + centerX, -img.y * pathViewPort.scale.y + imageWH[1] / 4);
+			})
+			
+			chepBtns.push(btn);
+			
+			if (i === cheps.length - 1) {
+				let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${30 * btnsOffset + 10}px; left: 0" type="button" class="btn btn-block btn-light"><span>${getLocal("chart.end")}</span></button>`);
+				$(btnContainer).append(btn);
+		
+				btn.on("click", () => {
+					let img = imgs["end"];
+					pathViewPort.position = new PIXI.Point(-centerX * pathViewPort.scale.x + centerX, -img.y * pathViewPort.scale.y + imageWH[1] / 4);
+				})
+				chepBtns.push(btn);
+			}
+		}
+	});
+
 	let start = buildDataImage({type: "start", level: 0});
 	pathViewPort.addChild(start);
 	start.x = centerX;
 	start.y = imagePadding[1];
 	imgs["start"] = start;
+	jumpToBtn.find("select").append($(`<option value="start">${translate("Start")}</option>`));
 
 	let level = 1;
 	let lastHeight = blockGap[1];
@@ -659,6 +806,7 @@ function* _buildPathImage() {
 
 			d.used = true;
 			imgs["skill_" + d.id] = img;
+			jumpToBtn.find("select").append($(`<option value="${"skill_" + d.id}">${translate(json.title ?? "")}(skill_${d.id})</option>`));
 			lineImgs.push(img);
 		});
 		lastLevelData.job.forEach(d => {
@@ -673,6 +821,7 @@ function* _buildPathImage() {
 
 			d.used = true;
 			imgs["job_" + d.id] = img;
+			jumpToBtn.find("select").append($(`<option value="job_${d.id}">${icons[json.icon!]} ${translate(json.title ?? "")}(job_${d.id})</option>`));
 			lineImgs.push(img);
 		});
 		lastLevelData.construction.forEach(d => {
@@ -687,6 +836,7 @@ function* _buildPathImage() {
 
 			d.used = true;
 			imgs["construction_" + d.id] = img;
+			jumpToBtn.find("select").append($(`<option value="construction_${d.id}">${icons[json.icon!]} ${translate(json.title ?? "")}(construction_${d.id})</option>`));
 			lineImgs.push(img);
 		});
 		lastLevelData.exploration.forEach(d => {
@@ -701,6 +851,7 @@ function* _buildPathImage() {
 
 			d.used = true;
 			imgs["exploration_" + d.id] = img;
+			jumpToBtn.find("select").append($(`<option value="exploration_${d.id}">${icons[json.icon!]} ${translate(json.title ?? "")}(exploration_${d.id})</option>`));
 			lineImgs.push(img);
 		});
 		lastLevelData.boss.forEach(d => {
@@ -715,6 +866,7 @@ function* _buildPathImage() {
 
 			d.used = true;
 			imgs["boss_" + d.id] = img;
+			jumpToBtn.find("select").append($(`<option value="boss_${d.id}">${icons[json.icon!]} ${translate(json.title ?? "")}(boss_${d.id})</option>`));
 			lineImgs.push(img);
 		});
 		lastLevelData.bossPhase.forEach(d => {
@@ -729,6 +881,7 @@ function* _buildPathImage() {
 
 			d.used = true;
 			imgs["bossPhase_" + d.bossId + "_" + d.phase] = img;
+			jumpToBtn.find("select").append($(`<option value="bossPhase_${d.bossId}_${d.phase}">${icons[json.icon!]} ${translate(json.title ?? "")}(bossPhase_${d.bossId}_${d.phase})</option>`));
 			lineImgs.push(img);
 		});
 		lastLevelData.hostile.forEach(d => {
@@ -855,31 +1008,9 @@ function* _buildPathImage() {
 	end.x = centerX;
 	end.y = imagePadding[1] + lastHeight + level * blockGap[1] + blockPadding + 15;
 	imgs["end"] = end;
+	jumpToBtn.find("select").append($(`<option value="end">${translate("End")}</option>`));
 
 	cheps.forEach((c, i) => {
-		if (!chepBtns[i]) {
-			let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${(cheps.length - i + 2) * 30 + 10}px; left: 0" type="button" class="btn btn-block btn-light"><span>${getLocal("chart.chepPrefix")}${i + 1}${getLocal("chart.chepSuffix")}</span></button>`);
-			$(btnContainer).append(btn);
-	
-			btn.on("click", () => {
-				let img = imgs["exploration_" + c];
-				pathViewPort.position = new PIXI.Point(-centerX * pathViewPort.scale.x + centerX, -img.y * pathViewPort.scale.y + imageWH[1] / 4);
-			})
-			
-			chepBtns.push(btn);
-			
-			if (i === cheps.length - 1) {
-				let btn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-left: 10px;position: absolute; bottom: ${60 + 10}px; left: 0" type="button" class="btn btn-block btn-light"><span>${getLocal("chart.end")}</span></button>`);
-				$(btnContainer).append(btn);
-		
-				btn.on("click", () => {
-					let img = imgs["end"];
-					pathViewPort.position = new PIXI.Point(-centerX * pathViewPort.scale.x + centerX, -img.y * pathViewPort.scale.y + imageWH[1] / 4);
-				})
-				chepBtns.push(btn);
-			}
-		}
-
 		let sy = imgs["exploration_" + c];
 		let ey = imgs["exploration_" + (cheps[i + 1] - 1)];
 		if (!ey) {
@@ -1201,21 +1332,171 @@ function buildDataImage(json: DataJson) {
 }
 
 let hideSpoilerInterval: number | undefined;
+function checkVisible(data: Dependency): boolean {
+	if (!game) {
+		return false;
+	}
+
+	let deps: Dependency[] = [];
+	let completed = false;
+	switch (data.type) {
+		case "skill":
+			deps = gameData.skill[data.id].dependency!;
+			completed = game.skills[+data.id].instinctLevel.gt(0) || game.skills[+data.id].instinctExperience.gt(0);
+			break;
+		case "job":
+			deps = gameData.job[data.id].dependency!;
+			completed = game.jobs[+data.id].timesCompleted > 0;
+			break;
+		case "construction":
+			deps = gameData.construction[data.id].dependency!;
+			completed = game.construction[+data.id].timesCompleted > 0;
+			break;
+		case "exploration":
+			deps = gameData.exploration[data.id].dependency!;
+			completed = game.exploration[+data.id].timesCompleted > 0;
+			break;
+		case "hostile":
+			deps = gameData.hostile[data.id].dependency!;
+			break;
+		case "boss":
+			if (data.phase === undefined) {
+				deps = gameData.boss[data.id].dependency!;
+			} else {
+				deps = gameData.bossPhase[data.id][data.phase].dependency!;
+			}
+			break;
+		default:
+			deps = undefined as any;
+	}
+
+	if (completed) {
+		return true;
+	}
+
+	if (deps === undefined) {
+		throw new Error("no deps");
+	}
+
+	let result = true;
+	result = deps.every((dep, i) => {
+		if (dep.type === "skill") {
+			let d = game!.skills[+dep.id];
+			if (!d) {
+				console.log(dep);
+				throw new Error("no dep data");
+			}
+			return !(d.instinctLevel.eq(0) && d.instinctExperience.eq(0));
+		} else if (dep.type === "job") {
+			let d = game!.jobs[+dep.id];
+			if (!d) {
+				console.log(dep);
+				throw new Error("no dep data");
+			}
+			return d.timesCompleted;
+		} else if (dep.type === "construction") {
+			let d = game!.construction[+dep.id];
+			if (!d) {
+				console.log(dep);
+				throw new Error("no dep data");
+			}
+			return d.timesCompleted;
+		} else if (dep.type === "exploration") {
+			let d = game!.exploration[+dep.id];
+			if (!d) {
+				console.log(dep);
+				throw new Error("no dep data");
+			}
+			return d.timesCompleted;
+		} else if (dep.type === "hostile") {
+			console.warn("no hostile dep check");
+			return true;
+		} else if (dep.type === "boss") {
+			if (dep.phase === undefined) {
+				let selfVisible = checkVisible({type: "boss", id: dep.id});
+				return selfVisible;
+			} else {
+				// console.warn("no boss phase dep check");
+				let selfVisible = checkVisible({type: "boss", id: dep.id, phase: dep.phase});
+				return selfVisible;
+			}
+		}
+	});
+
+	return result;
+}
+function formatSpoiler(visible: boolean, key: string) {
+	let img = imgs[key];
+	let links = linkImgs[key];
+	let el = jumpToBtn.find("select").find(`option[value='${key}']`)[0];
+	if (!visible) {
+		if (img && img.visible) {
+			img.visible = false;
+		}
+		if (links) {
+			Object.values(links).forEach((link) => {
+				if (link.visible) {
+					link.visible = false;
+				}
+			});
+		}
+		if (el && el.style.display !== "none") {
+			el.style.display = "none";
+		}
+	} else {
+		if (img && !img.visible) {
+			img.visible = true;
+		}
+		if (links) {
+			Object.values(links).forEach((link) => {
+				if (!link.visible) {
+					link.visible = true;
+				}
+			});
+		}
+		if (el && el.style.display !== "") {
+			el.style.display = "";
+		}
+	}
+}
 function hideSpoiler() {
 	if (!hideSpoilerInterval) {
-		hideSpoilerInterval = window.setInterval(() => {
-			if (game) {
-				game.skills.forEach(d => {
-					if (d.instinctLevel.eq(0)) {
-						
-					}
-				})
-			}
-
-			// Object.values(imgs).forEach(img => img.visible = true);
-			// Object.values(linkImgs).forEach(links => Object.values(links).forEach(img => img.visible = true));
-		}, 1000);
+		hideSpoilerInterval = window.setInterval(_hideSpoiler, 1000);
+		_hideSpoiler();
 	}
+}
+function _hideSpoiler() {
+	Object.values(gameData.skill).forEach((d, i) => {
+		let visible = checkVisible({id: "" +i, type: "skill"});
+		formatSpoiler(visible, "skill_" + i);
+	})
+	Object.values(gameData.job).forEach((d, i) => {
+		let visible = checkVisible({id: "" +i, type: "job"});
+		formatSpoiler(visible, "job_" + i);
+	})
+	Object.values(gameData.construction).forEach((d, i) => {
+		let visible = checkVisible({id: "" +i, type: "construction"});
+		formatSpoiler(visible, "construction_" + i);
+	})
+	Object.values(gameData.exploration).forEach((d, i) => {
+		let visible = checkVisible({id: "" +i, type: "exploration"});
+		formatSpoiler(visible, "exploration_" + i);
+	})
+	Object.values(gameData.hostile).forEach((d, i) => {
+		let visible = checkVisible({id: "" +i, type: "hostile"});
+		formatSpoiler(visible, "hostile_" + i);
+	})
+	Object.values(gameData.boss).forEach((d, i) => {
+		let visible = checkVisible({id: "" +i, type: "boss"});
+		formatSpoiler(visible, "boss_" + i);
+	})
+	Object.values(gameData.bossPhase).forEach(bossPhase => {
+		Object.values(bossPhase).forEach((d, i) => {
+			let visible = checkVisible({id: "" +d.bossId, type: "boss", phase: i});
+			formatSpoiler(visible, "bossPhase_" + d.bossId + "_" + i);
+		})
+	})
+	pathPIXI.render();
 }
 function showSpoiler() {
 	if (hideSpoilerInterval) {
@@ -1225,6 +1506,139 @@ function showSpoiler() {
 
 	Object.values(imgs).forEach(img => img.visible = true);
 	Object.values(linkImgs).forEach(links => Object.values(links).forEach(img => img.visible = true));
+	jumpToBtn.find("select").find("option").each((idx, option) => {
+		option.style.display = "";
+	});
+
+	pathPIXI.render();
+}
+
+let highLightNotAutoInterval: number | undefined;
+let autoAlpha = 0.3;
+function checkAuto(data: Dependency): boolean {
+	if (!game) {
+		return false;
+	}
+
+	let result = false;
+	switch (data.type) {
+		case "skill":
+			result = true;
+			break;
+		case "job":
+			result = game.jobs[+data.id].isAutomationUnlocked;
+			break;
+		case "construction":
+			result = game.construction[+data.id].isAutomationUnlocked;
+			break;
+		case "exploration":
+			result = game.exploration[+data.id].isAutomationUnlocked;
+			break;
+		case "hostile":
+			result = true
+			break;
+		case "boss":
+			let deps = gameData.boss[data.id].dependency!;
+			if (data.phase !== undefined) {
+				deps = gameData.bossPhase[data.id][data.phase].dependency!;
+			}
+			if (deps === undefined) {
+				throw new Error("no deps");
+			}
+			result = deps.every((dep, i) => {
+				return checkAuto({type: dep.type, id: dep.id, phase: dep.phase});
+			});
+			break;
+		default:
+			result = false;
+	}
+
+	return result;
+}
+function formatHighLight(auto: boolean, key: string, color = "") {
+	let img = imgs[key];
+	let el = jumpToBtn.find("select").find(`option[value='${key}']`)[0];
+	if (auto) {
+		if (img && img.alpha !== autoAlpha) {
+			img.alpha = autoAlpha;
+		}
+		if (el && el.style.color !== color) {
+			el.style.color = color;
+		}
+	} else {
+		if (img && img.alpha !== 1) {
+			img.alpha = 1;
+		}
+		if (el && el.style.color !== "") {
+			el.style.color = "";
+		}
+	}
+}
+function enableHighLightNotAuto() {
+	if (!highLightNotAutoInterval) {
+		highLightNotAutoInterval = window.setInterval(_enableHighLightNotAuto, 1000);
+		_enableHighLightNotAuto();
+	}
+}
+function _enableHighLightNotAuto() {
+	let color = "";
+	try {
+		let c = rootEl[0].getFormControlStyle().color[0];
+		c = c.replace("rgb", "rgba").replace(")", ", " + autoAlpha + ")");
+		color = c;
+	} catch (error) {
+	}
+	Object.values(gameData.skill).forEach((d, i) => {
+		let auto = checkAuto({id: "" +i, type: "skill"});
+		formatHighLight(auto, "skill_" + i, color);
+	})
+	Object.values(gameData.job).forEach((d, i) => {
+		let auto = checkAuto({id: "" +i, type: "job"});
+		formatHighLight(auto, "job_" + i, color);
+	})
+	Object.values(gameData.construction).forEach((d, i) => {
+		let auto = checkAuto({id: "" +i, type: "construction"});
+		formatHighLight(auto, "construction_" + i, color);
+	})
+	Object.values(gameData.exploration).forEach((d, i) => {
+		let auto = checkAuto({id: "" +i, type: "exploration"});
+		formatHighLight(auto, "exploration_" + i, color);
+	})
+	Object.values(gameData.hostile).forEach((d, i) => {
+		let auto = checkAuto({id: "" +i, type: "hostile"});
+		formatHighLight(auto, "hostile_" + i, color);
+	})
+	Object.values(gameData.boss).forEach((d, i) => {
+		let auto = checkAuto({id: "" +i, type: "boss"});
+		formatHighLight(auto, "boss_" + i, color);
+	})
+	Object.values(gameData.bossPhase).forEach(bossPhase => {
+		Object.values(bossPhase).forEach((d, i) => {
+			let auto = checkAuto({id: "" +d.bossId, type: "boss", phase: i});
+			formatHighLight(auto, "bossPhase_" + d.bossId + "_" + i, color);
+		})
+	})
+
+	let el = jumpToBtn.find("select").find(`option[value='start']`)[0];
+	formatHighLight(true, "start", color);
+
+	el = jumpToBtn.find("select").find(`option[value='end']`)[0];
+	formatHighLight(true, "end", color);
+
+	pathPIXI.render();
+}
+function disableHighLightNotAuto() {
+	if (highLightNotAutoInterval) {
+		clearInterval(highLightNotAutoInterval);
+		highLightNotAutoInterval = undefined;
+	}
+
+	Object.values(imgs).forEach(img => img.alpha = 1);
+	jumpToBtn.find("select").find("option").each((idx, option) => {
+		option.style.color = "";
+	});
+
+	pathPIXI.render();
 }
 
 function resizePathImage() {
@@ -1512,7 +1926,7 @@ function buildBossJson(data: Boss) {
 function buildBossPhaseJson(data: BossPhase) {
 	let icon = gameData.enemy[data.bossId].icon;
 	let name = gameData.boss[data.bossId].name;
-	let result: DataJson = {type: "bossPhase", title: name + " Phase " + data.phase, id: `bossPhase_${data.id}`, icon: icon, tooltip: [], extrReq: [], story:[], level: 0, children: []};
+	let result: DataJson = {type: "bossPhase", title: name + " Phase " + data.phase, id: `bossPhase_${data.bossId}_${data.id}`, icon: icon, tooltip: [], extrReq: [], story:[], level: 0, children: []};
 
 	if(gameData.bossPhase[data.bossId] && gameData.bossPhase[data.bossId][data.id]) {
 		let phase = gameData.bossPhase[data.bossId][data.id];
@@ -1993,59 +2407,6 @@ function analysisGameData() {
 		conds.push(...getCond(data.canRun, "exploration", data));
 		data.dependency = conds;
 	});
-
-	//去重
-	Object.keys(gameData.skill).forEach((key) => {
-		let data = gameData.skill[key];
-		let conds = data.dependency;
-		if (conds) {
-			data.dependency = mergeCond(conds);
-		}
-	});
-	Object.keys(gameData.job).forEach((key) => {
-		let data = gameData.job[key];
-		let conds = data.dependency;
-		if (conds) {
-			data.dependency = mergeCond(conds);
-		}
-	});
-	Object.keys(gameData.construction).forEach((key) => {
-		let data = gameData.construction[key];
-		let conds = data.dependency;
-		if (conds) {
-			data.dependency = mergeCond(conds);
-		}
-	});
-	Object.keys(gameData.exploration).forEach((key) => {
-		let data = gameData.exploration[key];
-		let conds = data.dependency;
-		if (conds) {
-			data.dependency = mergeCond(conds);
-		}
-	});
-	Object.keys(gameData.boss).forEach((key) => {
-		let data = gameData.boss[key];
-		let conds = data.dependency;
-		if (conds) {
-			data.dependency = mergeCond(conds);
-		}
-	});
-	Object.values(gameData.bossPhase).forEach(bossPhase => {
-		Object.keys(bossPhase).forEach((key) => {
-			let data = bossPhase[key];
-			let conds = data.dependency;
-			if (conds) {
-				data.dependency = mergeCond(conds);
-			}
-		});
-	})
-	Object.keys(gameData.hostile).forEach((key) => {
-		let data = gameData.hostile[key];
-		let conds = data.dependency;
-		if (conds) {
-			data.dependency = mergeCond(conds);
-		}
-	});
 }
 function getCond(str: FuncString, type: AllType, data: SkillInfo | JobInfo | ConstructionInfo | ExplorInfo | HostileInfo) {
 	str = str.replace(/;$/, "");
@@ -2513,6 +2874,13 @@ function setLevelByParent(level: number, parent?: Dependency) {
 	if (parent?.type === "exploration" && gameData.exploration[parent.id].addBoss !== undefined) {
 		let bossId = gameData.exploration[parent.id].addBoss!;
 		let data = gameData.boss[bossId];
+		if (!data.dependency) {
+			data.dependency = [];
+		}
+		data.dependency.push({
+			id: parent.id,
+			type: "exploration",
+		});
 		if (!data.level || data.level < level + 1) {
 			data.level = level + 1;
 			isChange = true;

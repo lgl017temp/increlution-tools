@@ -1,4 +1,4 @@
-import { Plugin, save, load, toggle, plugins, settings, btnContainer, gameLoadPromise, Game, getLocal } from "../core";
+import { Plugin, save, load, toggle, plugins, settings, btnContainer, rootEl, gameLoadPromise, Game, getLocal } from "../core";
 
 import type DecimalType from "break_infinity.js";
 declare let Decimal: typeof DecimalType;
@@ -33,7 +33,7 @@ plugins.push({
 			toggle();
 		})
 		
-		speedBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.speedEn ? 'running' : 'paused'}"><i class="fas ${settings.speedEn ? 'fa-play' : 'fa-pause'}"></i> <span><input style="display: inline-block;width: 52px;text-align:center;height: 12px;font-size:12px;" type="text" class="form-control maxlength="3"> <span>${getLocal("cheat.speed")}</span></span></button>`);
+		speedBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.speedEn ? 'running' : 'paused'}"><i class="fas ${settings.speedEn ? 'fa-play' : 'fa-pause'}"></i> <span><input style="display: inline-block;width: 52px;text-align:center;height: 12px;font-size:12px;" type="text" class="form-control" maxlength="3"> <span>${getLocal("cheat.speed")}</span></span></button>`);
 		btnContainer.append(speedBtn);
 		speedBtn.find("input").val(settings.speedMul).on("input", function() {
 			let mul = +$(this).val()!;
@@ -60,7 +60,7 @@ plugins.push({
 			save();
 		});
 
-		skillBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.skillEn ? 'running' : 'paused'}"><i class="fas ${settings.skillEn ? 'fa-play' : 'fa-pause'}"></i> <span><input style="display: inline-block;width: 52px;text-align:center;height: 12px;font-size:12px;" type="text" class="form-control maxlength="3"> <span>${getLocal("cheat.skill")}</span></span></button>`);
+		skillBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.skillEn ? 'running' : 'paused'}"><i class="fas ${settings.skillEn ? 'fa-play' : 'fa-pause'}"></i> <span><input style="display: inline-block;width: 52px;text-align:center;height: 12px;font-size:12px;" type="text" class="form-control" maxlength="3"> <span>${getLocal("cheat.skill")}</span></span></button>`);
 		btnContainer.append(skillBtn);
 		skillBtn.find("input").val(settings.skillMul).on("input", function() {
 			let mul = +$(this).val()!;

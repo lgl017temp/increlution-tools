@@ -4,7 +4,9 @@
   "description": "",
   "scripts": {
     "watch": "rollup -cw",
-    "build": "rollup -c --environment BUILD:production"
+    "build": "rollup -c --environment BUILD:production",
+    "runInDebug": "cd app && Increlution.exe --remote-debugging-port=8315",
+    "openDebug": "start http://127.0.0.1:8315"
   },
   "author": "lgl017",
   "type": "module",

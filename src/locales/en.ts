@@ -11,6 +11,7 @@ locales["en"] = {
 		skill: "Times Exp",
 		health: "Lock Health",
 		storge: "Lock Storge",
+		perk: "Perk Free",
 		rebirth: "Auto Rebirth",
 		auto: "Unlock All Auto",
 		autoTip: "Please backup save first, can't undo!<br/>(use save and load implement)<br/>(press 3 sec)",

@@ -1,4 +1,4 @@
-import { Plugin, save, load, toggle, plugins, settings, btnContainer, rootEl, gameLoadPromise, Game, getLocal } from "../core";
+import { Plugin, save, load, toggle, plugins, settings, btnContainer, rootEl, gameLoadPromise, Game, getLocal, gameData, readDataPromise } from "../core";
 
 import type DecimalType from "break_infinity.js";
 declare let Decimal: typeof DecimalType;
@@ -11,6 +11,7 @@ let healthBtn: JQuery<HTMLElement>;
 let storgeBtn: JQuery<HTMLElement>;
 let rebirthBtn: JQuery<HTMLElement>;
 let autoBtn: JQuery<HTMLElement>;
+let perkBtn: JQuery<HTMLElement>;
 
 let toggleCheatBtn: JQuery<HTMLElement>;
 
@@ -117,6 +118,21 @@ plugins.push({
 			save();
 		});
 
+		perkBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.perkEn ? 'running' : 'paused'}"><i class="fas ${settings.perkEn ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("cheat.perk")}</span></button>`);
+		btnContainer.append(perkBtn);
+		perkBtn.on("click", function() {
+			if (settings.perkEn) {
+				settings.perkEn = false;
+				$(this).addClass("paused").removeClass("running");
+				$(this).find("i").addClass("fa-pause").removeClass("fa-play");
+			} else {
+				settings.perkEn = true;
+				$(this).removeClass("paused").addClass("running");
+				$(this).find("i").removeClass("fa-pause").addClass("fa-play");
+			}
+			save();
+		});
+
 		rebirthBtn = $(`<button style="height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" id="pause-button" type="button" class="btn btn-block btn-success ${settings.rebirthEn ? 'running' : 'paused'}"><i class="fas ${settings.rebirthEn ? 'fa-play' : 'fa-pause'}"></i> <span>${getLocal("cheat.rebirth")}</span></button>`);
 		btnContainer.append(rebirthBtn);
 		rebirthBtn.on("click", function() {
@@ -205,6 +221,8 @@ plugins.push({
 
 		rebirthEn: false,
 
+		perkEn: false,
+
 		showCheat: false,
 	},
 	toggle: () => {
@@ -213,6 +231,7 @@ plugins.push({
 			skillBtn.show();
 			healthBtn.show();
 			storgeBtn.show();
+			perkBtn.show();
 			rebirthBtn.show();
 			autoBtn.show();
 		} else {
@@ -220,6 +239,7 @@ plugins.push({
 			skillBtn.hide();
 			healthBtn.hide();
 			storgeBtn.hide();
+			perkBtn.hide();
 			rebirthBtn.hide();
 			autoBtn.hide();
 		}
@@ -229,6 +249,7 @@ plugins.push({
 		skillBtn.find("span").find("span").html(getLocal("cheat.skill") as string);
 		healthBtn.find("span").html(getLocal("cheat.health") as string);
 		storgeBtn.find("span").html(getLocal("cheat.storge") as string);
+		perkBtn.find("span").html(getLocal("cheat.perk") as string);
 		rebirthBtn.find("span").html(getLocal("cheat.rebirth") as string);
 		autoBtn.find("span").html(getLocal("cheat.auto") as string);
 		autoBtn.attr("data-original-title", getLocal("cheat.autoTip") as string);
@@ -259,10 +280,9 @@ gameLoadPromise.then(() => {
 		}
 	}, 200);
 	
-	
 	if (game) {
 		let __add = game.inventory[0][0].amount.__proto__.add;
-		game.inventory[0][0].amount.__proto__.add = function(this: DecimalType, t: DecimalType) {
+		game.inventory[0][0].amount.__proto__.add = function(t: DecimalType) {
 			//物品不减
 			if (settings.inventoryEn) {
 				let isInventory = game!.inventory.find(i => i.find(d => d.amount === this));
@@ -297,3 +317,17 @@ gameLoadPromise.then(() => {
 		}
 	}
 })
+
+readDataPromise.then(() => {
+	//perk免费
+	Object.keys(gameData.perk).forEach((key) => {
+		let __pow = gameData.perk[key].priceScale.pow;
+		gameData.perk[key].priceScale.pow = function(t) {
+			if (settings.perkEn) {
+				return new Decimal(0);
+			} else {
+				return (__pow.bind(this))(t);
+			}
+		};
+	})
+});

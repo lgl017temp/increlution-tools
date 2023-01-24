@@ -9,6 +9,7 @@ export interface Plugin {
 export interface Autoable {
 	isAutomationUnlocked: boolean;
 	shouldAutomate: number | null;
+	timesCompleted: number;
 }
 export interface Game {
 	jobs: Autoable[];
@@ -43,7 +44,73 @@ let rollbackLocale = "cn";
 
 export let plugins: Plugin[] = [];
 
+class ToolContainer extends HTMLElement {
+	wrapper: HTMLBodyElement;
+
+	constructor() {
+		super();
+
+		const shadow = this.attachShadow({mode: 'open'});
+
+		const linkBootstrap = document.createElement('link');
+		linkBootstrap.href = "helpers/bootstrap.min.css";
+		linkBootstrap.rel = "stylesheet";
+		linkBootstrap.type = "text/css";
+		shadow.appendChild(linkBootstrap);
+
+		const linkFontawesome = document.createElement('link');
+		linkFontawesome.href = "helpers/fontawesome-pro-5.13.0-web/css/all.min.css";
+		linkFontawesome.rel = "stylesheet";
+		linkFontawesome.type = "text/css";
+		shadow.appendChild(linkFontawesome);
+
+		const linkGsrv = document.createElement('link');
+		linkGsrv.href = "gsrv.css";
+		linkGsrv.rel = "stylesheet";
+		linkGsrv.type = "text/css";
+		shadow.appendChild(linkGsrv);
+
+		this.wrapper = document.createElement('body');
+		if (window.document.body.classList.contains("dark")) {
+			this.wrapper.classList.add("dark");
+		}
+		shadow.appendChild(this.wrapper);
+
+		const classObserver = new MutationObserver((mutations) => {
+			mutations.forEach(mutation => {
+				if (mutation.type !== "attributes" && mutation.attributeName !== "class") {
+					return;
+				};
+
+				if (window.document.body.classList.contains("dark")) {
+					this.wrapper.classList.add("dark");
+				} else {
+					this.wrapper.classList.remove("dark");
+				}
+			});
+		});
+		classObserver.observe(window.document.body, {attributes: true});
+	}
+
+	getFormControlStyle(type: keyof HTMLElementTagNameMap = "input") {
+		let el = document.createElement(type) as any;
+		el.classList.add("form-control");
+		el.style.display = "none";
+		this.wrapper.appendChild(el);
+
+		let map = el.computedStyleMap();
+		let result: Record<string, string[]> = {};
+		map.forEach((v: any[], k: string) => {
+			result[k] = v.map(vv => vv.toString());
+		});
+		
+		this.wrapper.removeChild(el);
+		return result;
+	}
+}
+
 export let btnContainer: JQuery<HTMLElement>;
+export let rootEl: JQuery<ToolContainer>;
 let optionBtn: JQuery<HTMLElement>;
 export function init() {
 	load();
@@ -52,7 +119,10 @@ export function init() {
 	css.innerHTML = `#action-containers-column .row.game-block-container:last-child { margin-bottom: 30px; }`;
 	document.head.appendChild(css);
 
-	btnContainer = $(`<div style="display: flex; align-items: flex-end;flex-wrap: wrap;flex-direction: row;justify-content: flex-end;position: absolute; bottom: 0; left: 0; max-width: 100vw;"></div>`);
+	customElements.define("tool-container", ToolContainer); //使用自定义元素的shadow-element避免被汉化脚本抓取
+	// btnContainer = $(`<div style="display: flex; align-items: flex-end;flex-wrap: wrap;flex-direction: row;justify-content: flex-end;position: absolute; bottom: 0; left: 0; max-width: 100vw;"></div>`);
+	rootEl = $(`<tool-container style="display: flex; align-items: flex-end;flex-wrap: wrap;flex-direction: row;justify-content: flex-end;position: absolute; bottom: 0; left: 0; max-width: 100vw;"></tool-container>`);
+	btnContainer = $((rootEl[0] as ToolContainer).wrapper);
 
 	optionBtn = $(`<button style="margin-left: 40px;height:20px;padding:0 10px;font-size:12px;width: fit-content; display: inline-block; vertical-align: sub; margin-right: 10px;" type="button" class="btn btn-block btn-light""><span>${getLocal(`lang[${settings.locale}]`)}</span></button>`);
 	btnContainer.append(optionBtn);
@@ -84,7 +154,7 @@ export function init() {
 		}
 	});
 
-	btnContainer.appendTo("body");
+	rootEl.appendTo("body");
 	
 	toggle();
 }

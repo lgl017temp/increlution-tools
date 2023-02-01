@@ -13,7 +13,7 @@ locales["cn"] = {
 		storge: "锁库存",
 		perk: "特权免费",
 		rebirth: "自动转生",
-		auto: "解锁自动",
+		auto: "解锁自动(长按, 请先备份存档)",
 		autoTip: "请先备份存档，此操作无撤销！<br/>(使用存读档方式)<br/>(按住3秒)",
 	},
 	chart: {

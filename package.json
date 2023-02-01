@@ -6,7 +6,9 @@
     "watch": "rollup -cw",
     "build": "rollup -c --environment BUILD:production",
     "runInDebug": "cd app && Increlution.exe --remote-debugging-port=8315",
-    "openDebug": "start http://127.0.0.1:8315"
+    "openDebug": "start http://127.0.0.1:8315",
+
+	"chs_run": "cd chs/script & tsc checkChs.ts & copy checkChs.js checkChs.cjs /y & node checkChs.cjs"
   },
   "author": "lgl017",
   "type": "module",

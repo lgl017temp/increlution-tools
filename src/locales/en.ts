@@ -13,8 +13,8 @@ locales["en"] = {
 		storge: "Lock Storge",
 		perk: "Perk Free",
 		rebirth: "Auto Rebirth",
-		auto: "Unlock All Auto",
-		autoTip: "Please backup save first, can't undo!<br/>(use save and load implement)<br/>(press 3 sec)",
+		auto: "Unlock All Auto(Hold, Backup save first)",
+		autoTip: "Please backup save first, can't undo!<br/>(use save and load implement)<br/>(Hold down 3 sec)",
 	},
 	chart: {
 		togglePath: "Show Path",

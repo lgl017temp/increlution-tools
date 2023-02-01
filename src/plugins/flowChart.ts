@@ -819,7 +819,7 @@ function buildDataImage(json: DataJson) {
 
 			nextHeight += lineWidth + blockPadding * 2;
 
-			json.tooltip.forEach(tip => {
+			json.tooltip.forEach((tip, i) => {
 				tip = handleHtml(tip);
 				if (tip.includes("<")) {
 					console.log(tip);
@@ -832,6 +832,18 @@ function buildDataImage(json: DataJson) {
 				tooltipText.y = nextHeight;
 	
 				nextHeight += tooltipText.height;
+
+				if (i !== json.tooltip!.length - 1) {
+					let splitLine = new PIXI.Graphics();
+					result.addChild(splitLine);
+					splitLine.x = 0;
+					splitLine.y = nextHeight + blockPadding;
+					splitLine.lineStyle(lineWidth, borderColor, 0.3);
+					splitLine.moveTo(0, +lineWidth / 2)
+					splitLine.lineTo(realBlockW, +lineWidth / 2);
+
+					nextHeight += lineWidth + blockPadding * 2;
+				}
 			});
 		}
 
@@ -1572,7 +1584,7 @@ function buildHostileJson(data: HostileInfo) {
 	if (data.completionSpeedIncrease) {
 		expStr += ` *${data.completionSpeedIncrease.sub(1).mul(100).abs().toNumber()}%${data.completionSpeedIncrease.gt(1) ? icons["dec"] : icons["add"]}`;
 	}
-	let result: DataJson = {type: "hostile", title: data.name, id: `hostile_${data.id}`, icon: enemy.icon, exp: expStr, tooltip: [], extrReq: [], story:[], level: 0, children: []};
+	let result: DataJson = {type: "hostile", title: data.name, id: `hostile_${data.id}`, icon: enemy.icon, exp: expStr, tooltip: [data.tooltip], extrReq: [], story:[], level: 0, children: []};
 
 	if (data.completionDamage) {
 		result.children!.push({type: "lifeBadEffect", title: `${icons["health"]} -${formatNum(data.completionDamage)}`, level: 0});
@@ -1595,9 +1607,9 @@ function handleHtml(str: string) {
 	str = str.replace(/<span style='white-space:nowrap;'>/g, "");
 	str = str.replace(/<span style='font-style: italic;'>/g, "");
 	str = str.replace(/<span style='font-weight: 500;'>/g, "");
-	str = str.replace(/<\/span>/g, "\n");
-	str = str.replace(/<q>/g, "\n");
-	str = str.replace(/<\/q>/g, "\n");
+	str = str.replace(/<\/span>/g, "");
+	str = str.replace(/<q>/g, "\"");
+	str = str.replace(/<\/q>/g, "\"");
 	return str;
 }
 
@@ -1693,7 +1705,7 @@ function translate(str: string) {
 	let notTrans = str.match(/[a-zA-Z]+/g);
 	if (notTrans) {
 		notTrans.forEach((val, i) => {
-			if (numUnits.indexOf(val) !== -1 || val === "DNA" || val === "Boss") {
+			if (numUnits.indexOf(val) !== -1 || val === "DNA" || val === "boss") {
 			} else {
 				isALLTrans = false;
 			}

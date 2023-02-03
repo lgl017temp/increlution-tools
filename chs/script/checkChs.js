@@ -27,12 +27,12 @@ if (match) {
             items_1[key] = lineNo;
             var value = item[key];
             if (typeof value === "string") {
-                // if (value.includes("\"")) {
-                // 	console.log(`line: ${lineNo}, 英文标点": "${key}"`);
-                // }
                 var strangeChar = value.match(/[^0-9a-zA-Z ：，。…！？、（）“”‘’,.!+-×/%<>#:←\n\t\[\]\(\)\u4e00-\u9fa5]/g);
                 if (strangeChar) {
                     console.log("line: ".concat(lineNo, ", key: ").concat(key), strangeChar, strangeChar.map(function (c) { return c.charCodeAt(0); }));
+                }
+                if (value.endsWith(")") || value.endsWith("）") || key.endsWith(")")) {
+                    console.log("line: ".concat(lineNo, ", key: ").concat(key, ", \u7ED3\u5C3E\u62EC\u53F7\""));
                 }
             }
         }

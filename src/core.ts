@@ -31,9 +31,20 @@ export interface Game {
 	}[];
 	health: DecimalType;
 
+	options: {
+		defaultAutomation: number[];
+	}
+
 	newGamePlus: {
 		dna: DecimalType;
 	}
+}
+export enum GameOptionsDefaultAutomation {
+	food = 0,
+	rawFood = 1,
+	resource = 2,
+	construction = 3,
+	exploration = 4,
 }
 export type RecordTree<K extends (string | number | symbol), V> = {
 	[key in K]: V | RecordTree<K, V>;
@@ -76,6 +87,7 @@ class ToolContainer extends HTMLElement {
 		shadow.appendChild(linkGsrv);
 
 		this.wrapper = document.createElement('body');
+		this.wrapper.style.backgroundColor = "transparent";
 		if (window.document.body.classList.contains("dark")) {
 			this.wrapper.classList.add("dark");
 		}
@@ -535,6 +547,8 @@ export interface Resource {
 	name: string;
 	description: string;
 
+	isFoodResource?: boolean;
+
 	used?: boolean;
 }
 
@@ -649,6 +663,7 @@ function readGameData() {
 			window.gameData = gameData;
 			window.vars = vars;
 			window.varNames = varNames;
+			window.allString = allString;
 
 			excractGameData(jsStr);
 			checkDataProp();
@@ -774,12 +789,14 @@ function excractGameData(jsStr: string) {
 		// if (typeof window[key] !== "function") {
 		// 	console.log(key, window[key]);
 		// }
+		// a0_0x134533
 	});
 	Object.keys(varNames).forEach(key => {
 		vars[varNames[key]] = key;
 	});
 	findJsName(jsStr, /^const (a0_0x[0-9a-f]+?)=\[/, "allString");
-	allString = (doEval(vars.allString) as string[]).map(s => window.atob(s));
+	allString.splice(0);
+	allString.push(...(doEval(vars.allString) as string[]).map(s => window.atob(s)));
 
 	findJsName(jsStr, new RegExp(`const (a0_0x[0-9a-f]+?)=function\\(_0x(?:[0-9a-f]+?),_0x(?:[0-9a-f]+?)\\){_0x(?:[0-9a-f]+?)=_0x(?:[0-9a-f]+?)-0x0;let _0x(?:[0-9a-f]+?)=${vars.allString}\\[_0x(?:[0-9a-f]+?)\\];`), "getString");
 	

@@ -1,4 +1,4 @@
-import { Plugin, save, load, toggle, plugins, settings, btnContainer, rootEl, gameLoadPromise, Game, getLocal, gameData, readDataPromise } from "../core";
+import { Plugin, save, load, toggle, plugins, settings, btnContainer, rootEl, gameLoadPromise, Game, getLocal, gameData, readDataPromise, GameOptionsDefaultAutomation } from "../core";
 
 import type DecimalType from "break_infinity.js";
 declare let Decimal: typeof DecimalType;
@@ -164,11 +164,24 @@ plugins.push({
 						confirmed = 3;
 						$(this).find("span").html(getLocal("cheat.auto") as string);
 
-						game.jobs.forEach(d => {
+						game.jobs.forEach((d, i) => {
 							if (!d.isAutomationUnlocked) {
 								d.isAutomationUnlocked = true;
 								if (d.shouldAutomate === null) {
-									d.shouldAutomate = 0;
+									let job = gameData.job[i];
+									let item = job.rewardedItems[0];
+									if (item.itemType === 0) {
+										d.shouldAutomate = game!.options.defaultAutomation[GameOptionsDefaultAutomation.food];
+									} else if (item.itemType === 1) {
+										let res = gameData.resource[item.itemId];
+										if (res.isFoodResource) {
+											d.shouldAutomate = game!.options.defaultAutomation[GameOptionsDefaultAutomation.rawFood];
+										} else {
+											d.shouldAutomate = game!.options.defaultAutomation[GameOptionsDefaultAutomation.resource];
+										}
+									} else {
+										d.shouldAutomate = game!.options.defaultAutomation[GameOptionsDefaultAutomation.resource];
+									}
 								}
 							}
 						});
@@ -176,7 +189,7 @@ plugins.push({
 							if (!d.isAutomationUnlocked) {
 								d.isAutomationUnlocked = true;
 								if (d.shouldAutomate === null) {
-									d.shouldAutomate = 0;
+									d.shouldAutomate = game!.options.defaultAutomation[GameOptionsDefaultAutomation.construction];
 								}
 							}
 						});
@@ -184,7 +197,7 @@ plugins.push({
 							if (!d.isAutomationUnlocked) {
 								d.isAutomationUnlocked = true;
 								if (d.shouldAutomate === null) {
-									d.shouldAutomate = 0;
+									d.shouldAutomate = game!.options.defaultAutomation[GameOptionsDefaultAutomation.exploration];
 								}
 							}
 						});

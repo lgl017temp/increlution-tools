@@ -33,13 +33,13 @@ if (match) {
 
 			let value = item[key];
 			if (typeof value === "string") {
-				// if (value.includes("\"")) {
-				// 	console.log(`line: ${lineNo}, 英文标点": "${key}"`);
-				// }
-
 				let strangeChar = value.match(/[^0-9a-zA-Z ：，。…！？、（）“”‘’,.!+-×/%<>#:←\n\t\[\]\(\)\u4e00-\u9fa5]/g);
 				if (strangeChar) {
 					console.log(`line: ${lineNo}, key: ${key}`, strangeChar, strangeChar.map(c => c.charCodeAt(0)));
+				}
+
+				if (value.endsWith(")") || value.endsWith("）") || key.endsWith(")")) {
+					console.log(`line: ${lineNo}, key: ${key}, 结尾括号"`);
 				}
 			}
 		}

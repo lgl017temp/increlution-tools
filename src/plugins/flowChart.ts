@@ -1285,7 +1285,7 @@ function buildJobJson(data: JobInfo) {
 	if (!skill) {
 		throw new Error("skill not match");
 	}
-	let result: DataJson = {type: "job", title: data.name, id: `job_${data.id}`, icon: skill.icon, exp: formatNum(data.requiredProgress.div(1000)), tooltip: [data.tooltip], level: 0, children: []};
+	let result: DataJson = {type: "job", title: data.name, id: `job_${data.id}`, icon: skill.icon, exp: formatNum(data.requiredProgress.div(1000)), tooltip: [], level: 0, children: []};
 	if (data.requiredResourceId !== undefined) {
 		let item = gameData.resource[data.requiredResourceId];
 		if (!skill) {
@@ -1299,6 +1299,17 @@ function buildJobJson(data: JobInfo) {
 	}
 	if (data.foodTrade !== undefined) {
 		result.children!.push({type: "item", title: "Food trade", exp: formatNum(data.foodTrade.requiredFoodValue), id: `foodTrade_${data.id}`, level: 0});
+	}
+	if (data.getTooltip) {
+		if (data.name === "Pick portobello") {
+			result.tooltip!.push(`Provides 1 portobello mushroom per completion (+1.60 M health when eaten). If only you would have had some mushroom training. You can't really tell which ones to gather, so let's play it safe and not gather them for now`);
+			result.tooltip!.push(`(finish Mushroom school) Provides 1 portobello mushroom per completion (+1.60 M health when eaten). Luckily you've had some mushroom training, so you know which ones to gather!`);
+		} else {
+			console.warn(data);
+			result.tooltip!.push(data.tooltip);
+		}
+	} else {
+		result.tooltip!.push(data.tooltip);
 	}
 	Object.values(data.rewardedItems).forEach(reward => {
 		let item: Resource | Food;
@@ -1348,6 +1359,7 @@ function buildConstructionJson(data: ConstructionInfo) {
 			result.tooltip!.push(`(finish Reinforced belt) Quadruples your <i class='far fa-heart'></i> maximum health, but replaces your iron belt if you have one (you do, effectively making this a 33.3% bonus)`);
 		} else {
 			console.warn(data);
+			result.tooltip!.push(data.tooltip);
 		}
 	} else {
 		result.tooltip!.push(data.tooltip);
@@ -1424,6 +1436,7 @@ function buildExplorJson(data: ExplorInfo) {
 			result.tooltip!.push(`Fire your catapult at the titan to damage it from a distance! This requires a loaded catapult to work<br/>Can be completed up to ten times before the titan learns to dodge your shots, but gets harder with every successful shot up until that point<br/>You've successfully fired 0 / 10 times at the titan so far`);
 		} else {
 			console.warn(data);
+			result.tooltip!.push(data.tooltip);
 		}
 	} else {
 		result.tooltip!.push(data.tooltip);
@@ -1726,6 +1739,7 @@ gameLoadPromise.then(() => {
 		// window.imgs = imgs;
 		window.exportNoTrans = exportNoTrans;
 		window.allNoTrans = allNoTrans;
+		window.translate = translate;
 		// window.translate = translate;
 	}, 1000);
 });

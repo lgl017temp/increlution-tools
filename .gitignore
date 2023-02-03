@@ -1,7 +1,7 @@
 node_modules
 debug
 chs/core.js
-chs/increlution-chs_ori.js
+chs/increlution-chs_ori*.js
 chart.puml
 app
 yarn.lock

@@ -1305,7 +1305,7 @@ function buildJobJson(data: JobInfo) {
 			result.tooltip!.push(`Provides 1 portobello mushroom per completion (+1.60 M health when eaten). If only you would have had some mushroom training. You can't really tell which ones to gather, so let's play it safe and not gather them for now`);
 			result.tooltip!.push(`(finish Mushroom school) Provides 1 portobello mushroom per completion (+1.60 M health when eaten). Luckily you've had some mushroom training, so you know which ones to gather!`);
 		} else {
-			console.warn(data);
+			console.warn("job", data);
 			result.tooltip!.push(data.tooltip);
 		}
 	} else {
@@ -1358,7 +1358,7 @@ function buildConstructionJson(data: ConstructionInfo) {
 			result.tooltip!.push(`Quadruples your <i class='far fa-heart'></i> maximum health, but replaces your iron belt if you have one (you don't)`);
 			result.tooltip!.push(`(finish Reinforced belt) Quadruples your <i class='far fa-heart'></i> maximum health, but replaces your iron belt if you have one (you do, effectively making this a 33.3% bonus)`);
 		} else {
-			console.warn(data);
+			console.warn("construction", data);
 			result.tooltip!.push(data.tooltip);
 		}
 	} else {
@@ -1430,12 +1430,12 @@ function buildExplorJson(data: ExplorInfo) {
 			result.tooltip!.push(`(finish Cocowood cart) Watch your head! A cocowood cart that increases your <i class='far fa-trailer'></i> inventory capacity by 5<br/>You already own a cocowood cart, so you have no use for this debris`);
 			result.tooltip!.push(`(finish Strengthen cart and Cocowood cart) Watch your head! A cocowood cart that increases your <i class='far fa-trailer'></i> inventory capacity by 10<br/>You already own a cocowood cart, so you have no use for this debris`);
 		} else if (data.name === "Take dog's toy") {
-			result.tooltip!.push(`You can keep the iron stick if you manage to take it from the dog. It increases the multiplier of your <i class='far fa-swords'></i> combat skill by 25%.<br/>And since you don't own an iron stick yet, it may just come in handy!`);
-			result.tooltip!.push(`(finish Iron stick) You can keep the iron stick if you manage to take it from the dog. It increases the multiplier of your <i class='far fa-swords'></i> combat skill by 25%.<br/>However, you already own an iron stick, so you have no use for it`);
+			result.tooltip!.push(`You can keep the iron stick if you manage to take it from the dog. It increases the multiplier of your <i class='far fa-swords'></i> combat skill by 25%.<br/>And since you don't own an iron stick yet, it may just come in handy!<br/>You have a gut feeling that there might be more to this dog than meets the eye`);
+			result.tooltip!.push(`(finish Iron stick) You can keep the iron stick if you manage to take it from the dog. It increases the multiplier of your <i class='far fa-swords'></i> combat skill by 25%.<br/>However, you already own an iron stick, so you have no use for it<br/>You have a gut feeling that there might be more to this dog than meets the eye`);
 		} else if (data.name === "Fire at titan") {
 			result.tooltip!.push(`Fire your catapult at the titan to damage it from a distance! This requires a loaded catapult to work<br/>Can be completed up to ten times before the titan learns to dodge your shots, but gets harder with every successful shot up until that point<br/>You've successfully fired 0 / 10 times at the titan so far`);
 		} else {
-			console.warn(data);
+			console.warn("exploration", data);
 			result.tooltip!.push(data.tooltip);
 		}
 	} else {
@@ -1466,7 +1466,7 @@ function buildExplorJson(data: ExplorInfo) {
 				result.story!.push(`This beast is fast, but you've managed to hold on so far! It seems very determined in where it's bringing you. In the distance, you see an enormous constructions peeking through the clouds. And the dragon proceeds to fly directly to it`);
 				result.story!.push(`(finish 1 times) This beast is fast, but you've managed to hold on so far! It seems very determined in where it's bringing you. Almost as if it's done this before? In the distance, you see an enormous constructions peeking through the clouds. And the dragon proceeds to fly directly to it`);
 			} else {
-				console.warn(data);
+				console.warn("exploration", data);
 			}
 		} else {
 			result.story!.push(data.completedStory);

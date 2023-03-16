@@ -1010,6 +1010,7 @@ function checkDataProp() {
 				"requiredResourceAmount",
 				"foodTrade",
 				"isExcludedFromPassiveJobs",
+				"lookAheadSafetyExplorations",
 			].indexOf(k) === -1) {
 				console.warn("new prop", k, "job", data);
 			}
@@ -1078,6 +1079,7 @@ function checkDataProp() {
 				"bossPhases",
 				"bossScalingVariable",
 				"bossScalingVariableIncrease",
+				"chapterCompletionTrigger",
 			].indexOf(k) === -1) {
 				console.warn("new prop", k, "exploration", data);
 			}

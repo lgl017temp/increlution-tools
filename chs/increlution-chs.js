@@ -2151,7 +2151,7 @@ var cnItems = {
 	"to": "降低到",
 	"Determines how instinct increases are displayed on the reincarnation screen": "确定如何在转世屏幕上显示本能增加",
 	"Settings and automation settings will persist when you restart your generations. If the game isn't manually paused, offline time will be extended by the current generation time as well.": "当你重新开始你的世代时，设置和自动化设置将持续存在。 如果游戏没有手动暂停，离线时间也会延长当前世代的时间。",
-	"": "",
+	"maximum health in your next generation": "最大生命值提供给您的下一代",
 	"": "",
 	"": "",
 	"": "",
@@ -2376,6 +2376,7 @@ var cnPostfix = {
     "If the game isn't manually paused, offline time will be extended by the current generation time. With this setting enabled, the game is automatically unpaused on restart. Only disable this setting if you want the generation to restart paused (ex: if you want to see how changes affected your approach in regular speed": "如果游戏没有手动暂停，离线时间将延长当前世代时间。 启用此设置后，游戏将在重新启动时自动取消暂停。 只有在您希望世代重新启动时暂停才禁用此设置（例如：如果您想查看更改如何影响您以正常速度进行",
     "": "",
     "": "",
+    "": "",
 }
 
 //需排除的，正则匹配
@@ -2506,6 +2507,7 @@ var cnRegReplace = new Map([
     [/^([\d\.]+)e([\d\.,]+) exp$/, '$1e$2 经验'],
     [/^Instinct \(\+([\d\,]+)$/, '本能 (+$1'],
     [/^Level: ([\d\,]+) \(\+([\d\,]+)$/, '等级: $1 (+$2'],
+    [/^For surviving this long, you'll receive \+([\d\.]+(?:(?: [K|M|B|T|Qa])|(?:e(?:[\d\.,]+)))?)$/, '活了这么久，你会得到 +$1'],
     [/^\+?([\d\.]+(?:(?: [K|M|B|T|Qa])|(?:e(?:[\d\.,]+)))?) health when eaten$/, '食用时 +$1 生命值'],
     [/^\+?([\d\.]+(?:(?: [K|M|B|T|Qa])|(?:e(?:[\d\.,]+)))?) health when drunk$/, '喝下时 +$1 生命值'],
     [/^\+?([\d\.]+(?:(?: [K|M|B|T|Qa])|(?:e(?:[\d\.,]+)))?) health when consumed$/, '消耗时 +$1 生命值'],

@@ -813,7 +813,7 @@ function excractGameData(jsStr: string) {
 
 	findJsName(jsStr, new RegExp(`function (a0_0x[0-9a-f]+?)\\(_0x(?:[0-9a-f]+?),_0x(?:[0-9a-f]+?),_0x(?:[0-9a-f]+?)\\){let _0x(?:[0-9a-f]+?)=(?:${varNum0.join("|")});for\\(let _0x(?:[0-9a-f]+?) in game\\[(?:'inventory'|${vars.getString}\\('0x(?:[0-9a-f]+?)'\\))\\]\\[0x0\\]\\){`), "calcFoodTrade");
 
-	findJsName(jsStr, new RegExp(`function (a0_0x[0-9a-f]+?)\\(_0x(?:[0-9a-f]+?)\\){for\\(let _0x(?:[0-9a-f]+?) in ${vars.construction}\\[_0x(?:[0-9a-f]+?)\\]\\[${vars.getString}\\('0x(?:[0-9a-f]+?)'\\)\\]\\){let _0x(?:[0-9a-f]+?)=${vars.construction}\\[_0x(?:[0-9a-f]+?)\\]\\[${vars.getString}\\('0x(?:[0-9a-f]+?)'\\)\\]\\[_0x(?:[0-9a-f]+?)\\];`), "notArriveProgressStep");
+	findJsName(jsStr, new RegExp(`function (a0_0x[0-9a-f]+?)\\(_0x(?:[0-9a-f]+?)\\){for\\(let _0x(?:[0-9a-f]+?) in ${vars.construction}\\[_0x(?:[0-9a-f]+?)\\]\\[${vars.getString}\\('0x(?:[0-9a-f]+?)'\\)\\]\\){let _0x(?:[0-9a-f]+?)=${vars.construction}\\[_0x(?:[0-9a-f]+?)\\]\\[(?:'requiredResources'|${vars.getString}\\('0x(?:[0-9a-f]+?)'\\))\\]\\[_0x(?:[0-9a-f]+?)\\];`), "notArriveProgressStep");
 
 	findJsName(jsStr, new RegExp(`function (a0_0x[0-9a-f]+?)\\(_0x(?:[0-9a-f]+?)\\){if\\(game\\[(?:'boss'|${vars.getString}\\('0x(?:[0-9a-f]+?)'\\))\\]==null\\)return 0x0;`), "getBossVariable");
 
@@ -1011,6 +1011,7 @@ function checkDataProp() {
 				"foodTrade",
 				"isExcludedFromPassiveJobs",
 				"lookAheadSafetyExplorations",
+				"lookAheadSafetyException",
 			].indexOf(k) === -1) {
 				console.warn("new prop", k, "job", data);
 			}

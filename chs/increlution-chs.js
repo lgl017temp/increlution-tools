@@ -1702,7 +1702,7 @@ var cnItems = {
 	"Stone titan defeated": "击败石泰坦",
 	"And down it goes! After some last slow movements, it smashes into the ground face-first, before it stops moving entirely. The impact covers the entire vault, or what's left of it, in a thick dust, but that should settle down quickly enough. You notice the chestplate dropping out of the titan now that it has hit the ground, and it appears to be inscribed on the inside": "它往下走！ 在最后一些缓慢的动作之后，它先是脸先撞到地上，然后才完全停止移动。 撞击在厚厚的灰尘中覆盖了整个金库，或者它剩下的部分，但应该足够快地稳定下来。 你注意到泰坦的胸甲在撞到地面后从它身上掉了下来，它似乎刻在里面",
 	"You notice an inscription within the inside of the titan's chestplate, now that it dropped off of its body": "你注意到泰坦胸甲内侧的铭文，现在它从身体上掉下来了",
-	"\"If anyone ever reads this, my suspicion may have proven true. I just hope I've managed to protect the artifact long enough not to fall into the hands of greed. If you're one of the good ones, or maybe even one like us, please find a way to disable the core. It should have remained stable for long enough by powering the titan. But without a way to channel its power, it may not remain stable for long. If you do succeed, please find me after. I'll be heading west, through the passage that should reopen when the core deactivates.\"": "“如果有人读到这篇文章，我的怀疑可能会被证明是正确的。我只希望我能保护这件神器足够长的时间，不要落入贪婪之手。如果你是好人中的一员，或者甚至是好人中的一员 像我们一样，请想办法让核心失效。通过为泰坦提供动力，它应该可以保持稳定足够长的时间。但是如果没有办法引导它的力量，它可能无法保持稳定。如果你成功了，请找我 之后。我要往西走，穿过核心停用后应该重新打开的通道。”",
+	"\"If anyone ever reads this, my suspicion may have proven true. I just hope I've managed to protect the artifact long enough not to fall into the hands of greed. If you're one of the good ones, or maybe even one like us, please find a way to disable the core. It should have remained stable for long enough by powering the titan. But without a way to channel its power, it may not remain stable for long. If you do succeed, please find me after. I'll be heading west, through the passage that should reopen when the core deactivates.\"": "“如果有人读到这篇文章，我的怀疑可能会被证明是正确的。我只希望我能保护这件神器足够长的时间，不要落入贪婪之手。如果你是好人中的一员，或者甚至是好人中的一员 像我们一样，请想办法让核心失效。通过为泰坦提供动力，它应该可以保持稳定足够长的时间。但是如果没有办法引导它的力量，它可能无法保持稳定。如果你成功了，请之后找我。我要往西走，穿过核心停用后应该重新打开的通道。”",
 	"Inspect the mechanical core within the chest of the stone titan": "检查石泰坦胸膛内的机械核心",
 	"This thing is like nothing you've seen before, it's a combination of lights and cogs that seems to function as some sort of self-powering energy source. At this point, your hourglass has started to tremble in a way you've only seen a couple of times before. You have a strong feeling that your hourglass can funnel some of the power from this core. Yet you feel inclined to disable it before moving on. Even if you're not fully sure why the inscription warned for this source of power, you feel inclined to oblige": "这东西和你以前见过的任何东西都不一样，它是灯和齿轮的组合，似乎起到某种自供电能源的作用。 此时，您的沙漏开始以您以前只见过几次的方式颤抖。 你有一种强烈的感觉，你的沙漏可以从这个核心中汲取一些力量。 然而，你倾向于在继续之前禁用它。 即使您不完全确定为什么铭文会警告这种力量来源，您还是觉得有义务这样做",
 	"Funnel some of the power of the titan's energy source into your hourglass": "将泰坦能量源的部分能量汇集到你的沙漏中",
@@ -2156,7 +2156,7 @@ var cnItems = {
 	"Settings and automation settings will persist when you restart your generations. If the game isn't manually paused, offline time will be extended by the current generation time as well.": "当你重新开始你的世代时，设置和自动化设置将持续存在。 如果游戏没有手动暂停，离线时间也会延长当前世代的时间。",
 	"maximum health in your next generation": "最大生命值提供给您的下一代",
 	"at": "在",
-	"": "",
+	"You did not progress towards any new automation unlocks during this generation": "在这一代中，您没有取得任何新的自动化解锁进展",
 	"": "",
 	"": "",
 
